@@ -1,0 +1,34 @@
+# Local scientific datasets
+data/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environments
+.venv/
+venv/
+env/
+*.egg-info/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local temporary audit material
+audit_outputs/**/tmp/
+audit_outputs/**/synthetic_videos/
+audit_outputs/**/decoded_frames/
+audit_outputs/**/contact_sheets/
+audit_outputs/**/*.avi
+audit_outputs/**/*.mp4
+
+# Generated application outputs
+*_analysis.xlsx
+*_labeled.avi
+*_labeled.mp4
