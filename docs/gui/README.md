@@ -91,6 +91,19 @@ python -m pytest -m gui
 These tests need no raw microscopy data and create output only inside
 automatically cleaned repository-local test directories.
 
+An optional ignored local dataset can exercise the same screen without
+becoming part of ordinary testing:
+
+```powershell
+$env:ICLOTS_TEST_DATA_DIR = "<local path>"
+$env:QT_QPA_PLATFORM = "offscreen"
+python -m pytest -m local_data
+```
+
+The selected local smoke sequence and its limitations are documented in
+[`../testing/local_test_data_inventory.md`](../testing/local_test_data_inventory.md).
+It establishes file-loading and workflow operability, not legacy parity.
+
 ## Visual review steps
 
 1. Launch with `python -m iclotspython.gui`.
