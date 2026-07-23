@@ -201,7 +201,7 @@ pandas, or spreadsheet engine.
 The supported modern boundary is now:
 
 ```text
-future UI / CLI / notebook
+PySide6 UI / future CLI / notebook
         |
         v
 application service --> ROIAccumulationResult
@@ -211,13 +211,70 @@ application service --> ROIAccumulationResult
 ```
 
 File selection, user confirmation, progress UI, and display of manifest
-issues remain responsibilities of future consumers. Phase 3B does not add a
-GUI, CLI, notebook wrapper, background worker, or project/session model.
+issues are consumer responsibilities. Phase 3B itself does not add a GUI,
+CLI, notebook wrapper, background worker, or project/session model.
+
+## Phase 3C PySide6 boundary
+
+Phase 3C adds `iclotspython.gui` as a replaceable presentation client. It owns
+widgets, navigation, local screen state, file selection, image loading,
+preview, user confirmation, and translation of structured contracts into
+visible controls. It does not import `iclotspython.core`, legacy GUI modules,
+or legacy analysis adapters.
+
+```text
+MainWindow
+    |
+    v
+ROIAccumulationScreen --builds--> ROIAccumulationRequest
+    |                                  |
+    |                                  v
+    |                          AnalysisWorker / QThread
+    |                                  |
+    |                                  v
+    |                         run_roi_accumulation
+    |                                  |
+    +<----------------------- ROIAccumulationResult
+    |
+    +--> table model / in-window plot
+    |
+    +--> PlotRequest / ExportRequest --> Phase 3B services
+                                            |
+                                            v
+                                      OutputManifest
+```
+
+The service remains synchronous. `AnalysisWorker` runs it on one `QThread`,
+forwards its existing progress events, and supplies the service's
+cancellation callable. The screen prevents overlapping runs. Cancellation is
+cooperative and uses `WorkflowCancelled`; Qt does not terminate computation
+forcibly.
+
+The screen stores ordered, preloaded RGB arrays separately from scientific
+requests. It constructs a new explicit request for each run, including channel
+convention, channels, thresholds, calibration, labels, time values, and source
+identifiers. Changes to any material input invalidate the displayed result so
+stale data cannot be exported. Successful reruns replace the previous result.
+
+The in-window table consumes `TableData`; the in-window figure consumes
+`roi_plot_series`. Saving uses only Phase 3B plot/export requests and
+manifests. Default no-overwrite behavior is preserved, and replacement
+requires an explicit confirmation in the screen.
+
+Importing `iclotspython.gui` alone constructs neither `QApplication` nor a
+window and does not load Qt. The canonical desktop entrypoint is:
+
+```powershell
+python -m iclotspython.gui
+```
+
+Phase 3C introduces no project/session persistence, batch execution,
+background job manager, additional workflow services, packaging, or installer.
+The Tkinter application remains on its transitional direct-core path.
 
 ## Future scope boundaries
 
-Phase 3A does not include PySide6 windows, Qt Designer files, file pickers,
-project/session persistence, batch processing, CLI or web APIs, packaging,
-installers, scientific corrections, all-workflow migration, or Tkinter
-removal. Phase 3B adds only headless ROI plot/CSV/XLSX output services; all
-other items remain out of scope.
+Phase 3C includes the PySide6 shell, native image/directory pickers, and one
+ROI screen. Qt Designer files, project/session persistence, batch processing,
+CLI or web APIs, packaging, installers, scientific corrections, all-workflow
+migration, and Tkinter removal remain out of scope.

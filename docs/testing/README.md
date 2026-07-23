@@ -31,6 +31,33 @@ importing output contracts and services does not load Tkinter, PySide6,
 matplotlib, pandas, openpyxl, OpenCV, or TrackPy. Plot and spreadsheet
 dependencies are loaded only when their formats are executed.
 
+## Phase 3C GUI coverage
+
+Phase 3C tests live under `tests/gui/` and use Qt's offscreen platform without
+requiring `pytest-qt` or a display server. They cover application-shell
+construction, enabled and disabled navigation, deterministic demo input,
+exact image-selection order, controlled dimension failures, request building,
+validation feedback, production-service delegation, progress, cooperative
+cancellation, overlap prevention, result replacement and invalidation,
+table/plot presentation, Phase 3B export delegation, overwrite policy, and
+success/partial/failure manifest display.
+
+Fresh-process safeguards verify that importing `iclotspython.gui` constructs
+no application or window and does not load PySide6. The application and core
+packages remain Qt-independent. GUI source safeguards reject Tkinter, legacy
+ROI adapters, direct core imports, and duplicated threshold/count operations.
+
+Install the optional desktop dependencies before running GUI tests:
+
+```powershell
+python -m pip install -r requirements-gui.txt
+$env:QT_QPA_PLATFORM = "offscreen"
+python -m pytest -m gui
+```
+
+The full Phase 3C development environment uses both `requirements-test.txt`
+and `requirements-gui.txt`.
+
 Phase 1 protects important numerical behavior before architectural refactoring. It is intentionally small: normal tests use committed arrays and CSV files, do not read `data/`, do not decode video, do not open historical workbooks, and do not import GUI-bound analysis modules.
 
 ## Test categories
@@ -40,8 +67,11 @@ Phase 1 protects important numerical behavior before architectural refactoring. 
 - `tests/scientific/` checks synthetic ground truth and scientific invariants that should survive implementation changes.
 - `tests/fixtures/velocity/` contains compact numerical inputs and provenance only.
 - `tests/support/` contains a clearly labeled pure reference implementation of the legacy numerical conventions. It is not a replacement for the GUI-bound KLT implementation.
+- `tests/gui/` checks the optional PySide6 presentation client headlessly.
 
-Markers mirror these categories: `unit`, `regression`, `scientific`, and reserved `slow`. No slow tests are currently included. A future slow suite should be run explicitly and should not become part of normal development execution.
+Markers mirror these categories: `unit`, `regression`, `scientific`, `gui`,
+and reserved `slow`. GUI tests also carry the `unit` marker. No slow tests are
+currently included.
 
 ## Development environment
 

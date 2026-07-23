@@ -27,13 +27,19 @@ Establish the desktop application shell, navigation, shared styling,
 application-state boundaries, background-work policy, and structured
 error/progress presentation. Do not migrate workflow calculations into Qt.
 
-Status: not begun.
+The approved Phase 3C implementation also includes the first functional ROI
+accumulation screen so the shell can be validated against the established
+Phase 3A and 3B boundaries rather than against placeholders alone.
 
-## Phase 3D — First modern workflow screen
+Status: implemented for the single-window shell and ROI accumulation. Other
+workflow navigation entries are visible but disabled.
 
-Implement one PySide6 workflow screen against the Phase 3A ROI service and
-Phase 3B plotting/export services. Validate usability and presentation parity
-before adding more screens.
+## Phase 3D — First workflow review and hardening
+
+Review the ROI screen with collaborators, validate presentation and export
+parity against representative legacy outcomes, improve accessibility and
+workflow usability, and resolve approved feedback before adding more screens.
+No new scientific formulas belong in this phase.
 
 ## Phase 3E — Incremental workflow migration
 
