@@ -11,6 +11,15 @@ to check relationships and archived/synthetic fixtures. See
 `docs/architecture/core_separation.md` for the adapter and duplicate-tree
 boundaries.
 
+## Phase 3A application-contract coverage
+
+Phase 3A tests validate in-memory ROI request normalization, explicit RGB/BGR
+ordering, structured errors and warnings, read-only defensive array copies,
+core delegation, baseline/calibration parity, progress, cancellation,
+provenance, table/plot/export-neutral helpers, deterministic execution, and
+filesystem/dependency boundaries. Tests import neither GUI modules nor local
+raw data. The original Phase 1 and Phase 2 suites remain unchanged in scope.
+
 Phase 1 protects important numerical behavior before architectural refactoring. It is intentionally small: normal tests use committed arrays and CSV files, do not read `data/`, do not decode video, do not open historical workbooks, and do not import GUI-bound analysis modules.
 
 ## Test categories
