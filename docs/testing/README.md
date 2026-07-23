@@ -20,6 +20,17 @@ provenance, table/plot/export-neutral helpers, deterministic execution, and
 filesystem/dependency boundaries. Tests import neither GUI modules nor local
 raw data. The original Phase 1 and Phase 2 suites remain unchanged in scope.
 
+## Phase 3B output-service coverage
+
+Phase 3B tests exercise deterministic ROI plot/export filenames, PNG
+rendering, CSV and XLSX content, destination creation and rejection, default
+no-overwrite behavior, explicit replacement, successful and partial
+manifests, stop/continue failure policies, checksums, writer cleanup, and the
+rule that only requested files survive. Fresh-process safeguards verify that
+importing output contracts and services does not load Tkinter, PySide6,
+matplotlib, pandas, openpyxl, OpenCV, or TrackPy. Plot and spreadsheet
+dependencies are loaded only when their formats are executed.
+
 Phase 1 protects important numerical behavior before architectural refactoring. It is intentionally small: normal tests use committed arrays and CSV files, do not read `data/`, do not decode video, do not open historical workbooks, and do not import GUI-bound analysis modules.
 
 ## Test categories

@@ -149,10 +149,75 @@ policy, file formats, user destinations, and optional dependencies. The
 application service remains deterministic, headless, and free of filesystem
 side effects.
 
+## Phase 3B output-service boundary
+
+Phase 3B adds `iclotspython.output` as the only modern layer in this
+architecture that writes presentation artifacts:
+
+```text
+ROIAccumulationResult
+        |
+        +--> PlotRequest   --> render_roi_plot --> PNG
+        |
+        +--> ExportRequest --> export_roi_data  --> CSV / XLSX
+                                      |
+                                      v
+                               OutputManifest
+```
+
+`ROIAccumulationResult` is the only numerical input. Output services consume
+`roi_table` and `roi_plot_series`; they do not import the scientific core,
+threshold arrays, calibrate values, or calculate accumulation.
+
+Requests explicitly define destination directory, optional directory
+creation, deterministic filename/stem, requested formats, overwrite policy,
+and multi-file failure policy. The default overwrite policy is
+`FAIL_IF_EXISTS`. Existing files are never changed unless the caller selects
+`REPLACE`. Explicit replacement is recorded in the manifest.
+
+Destination directories must already exist unless `create_destination=True`.
+Invalid or unwritable destinations fail before any output target is
+attempted. Filenames are leaf names with format-appropriate suffixes; callers
+cannot smuggle a second destination through a filename.
+
+Every requested target receives an `OutputFileRecord` with created, replaced,
+failed, or not-attempted status. Successful records include size and SHA-256.
+Warnings and failures use structured `OutputIssue` values. Overall manifests
+report success, partial success, or failure. Manifests stay in memory and do
+not create an unrequested manifest file.
+
+Multi-format export supports `STOP` and `CONTINUE`. `STOP` marks later formats
+not attempted after a failure. `CONTINUE` permits successful siblings and
+returns a partial manifest. Successfully completed files are not silently
+rolled back because the manifest is the explicit record of partial output.
+Temporary files used for explicit replacement are removed on failure.
+
+PNG rendering uses matplotlib's object-oriented `Figure` with the
+non-interactive Agg canvas; it does not import `pyplot`. CSV uses the standard
+library. XLSX uses openpyxl directly. Matplotlib and openpyxl imports are lazy,
+so importing `iclotspython.output` loads no GUI toolkit, plotting backend,
+pandas, or spreadsheet engine.
+
+The supported modern boundary is now:
+
+```text
+future UI / CLI / notebook
+        |
+        v
+application service --> ROIAccumulationResult
+                              |
+                              v
+                      output services --> files + manifest
+```
+
+File selection, user confirmation, progress UI, and display of manifest
+issues remain responsibilities of future consumers. Phase 3B does not add a
+GUI, CLI, notebook wrapper, background worker, or project/session model.
+
 ## Future scope boundaries
 
 Phase 3A does not include PySide6 windows, Qt Designer files, file pickers,
-plotting engines, spreadsheet writers, project/session persistence, batch
-processing, CLI or web APIs, packaging, installers, scientific corrections,
-all-workflow migration, or Tkinter removal.
-
+project/session persistence, batch processing, CLI or web APIs, packaging,
+installers, scientific corrections, all-workflow migration, or Tkinter
+removal. Phase 3B adds only headless ROI plot/CSV/XLSX output services; all
+other items remain out of scope.

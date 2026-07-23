@@ -18,11 +18,16 @@ Define explicit output requests, destination policy, overwrite behavior,
 format-specific errors, and parity tests. Scientific calculations remain in
 the core; Phase 3A services remain file-neutral.
 
+Status: implemented for ROI PNG, CSV, and XLSX outputs with structured
+manifests.
+
 ## Phase 3C — PySide6 application shell
 
 Establish the desktop application shell, navigation, shared styling,
 application-state boundaries, background-work policy, and structured
 error/progress presentation. Do not migrate workflow calculations into Qt.
+
+Status: not begun.
 
 ## Phase 3D — First modern workflow screen
 
@@ -36,4 +41,3 @@ Add application services and screens incrementally for device accumulation,
 microchannel accumulation, velocity, and tracking. Each migration requires
 core parity, request validation, presentation contracts, progress/error
 handling, and legacy-output comparison.
-
