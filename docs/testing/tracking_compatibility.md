@@ -1,6 +1,6 @@
 # Tracking compatibility policy
 
-This Phase 1 specification records current source behavior separately from GUI/help wording and general scientific invariants. The pure helpers and synthetic tests under `tests/` are evidence and executable specifications; they are not replacement tracking algorithms.
+This Phase 1 specification records current source behavior separately from GUI/help wording and general scientific invariants. The pure helpers and synthetic tests under `tests/` remain independent evidence and executable specifications. Phase 2 production measurements now live in `iclotspython.core.tracking`; TrackPy detection and linking remain in legacy adapters.
 
 ## Source trace and cross-workflow comparison
 

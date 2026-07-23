@@ -44,8 +44,12 @@ def test_importing_accumulation_reference_does_not_load_gui_or_imaging_stacks():
 
 
 @pytest.mark.parametrize("module", ["occroi.py", "occdevice.py", "occmicro.py"])
-def test_primary_and_softwareonly_accumulation_modules_remain_byte_identical(module):
-    assert (ROOT / "analysis" / module).read_bytes() == (
+def test_modernized_accumulation_adapters_diverge_and_delegate_to_core(module):
+    primary = (ROOT / "analysis" / module).read_text(encoding="utf-8")
+    duplicate = (
         ROOT / "iCLOTS_softwareonly" / "analysis" / module
-    ).read_bytes()
+    ).read_text(encoding="utf-8")
+    assert primary != duplicate
+    assert "from iclotspython.core.accumulation import" in primary
+    assert "iclotspython.core" not in duplicate
 

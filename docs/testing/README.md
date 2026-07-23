@@ -1,5 +1,16 @@
 # Phase 1 test foundation
 
+## Phase 2 production-core coverage
+
+Phase 2 adds direct tests in `test_accumulation_core.py`,
+`test_velocity_core.py`, `test_tracking_core.py`, and `test_core_imports.py`.
+They compare `iclotspython.core` with the independent Phase 1 references and
+verify the package is headless. Legacy and intended references remain
+specifications rather than production dependencies. Scientific tests continue
+to check relationships and archived/synthetic fixtures. See
+`docs/architecture/core_separation.md` for the adapter and duplicate-tree
+boundaries.
+
 Phase 1 protects important numerical behavior before architectural refactoring. It is intentionally small: normal tests use committed arrays and CSV files, do not read `data/`, do not decode video, do not open historical workbooks, and do not import GUI-bound analysis modules.
 
 ## Test categories

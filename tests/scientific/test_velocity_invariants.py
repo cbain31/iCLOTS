@@ -3,10 +3,12 @@ from pathlib import Path
 
 import pytest
 
-from tests.support.velocity_reference import (
-    axial_displacement,
+from iclotspython.core.velocity import (
     displacement_to_velocity,
     euclidean_displacement,
+)
+from tests.support.velocity_reference import (
+    axial_displacement,
     profile_metrics,
 )
 

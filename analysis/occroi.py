@@ -22,11 +22,15 @@ import matplotlib.pyplot as plt
 import datetime
 import shutil
 
+from iclotspython.core.accumulation import (
+    legacy_series_with_zero_baseline,
+    threshold_channel,
+)
+
 
 def occ_acc(filelist, colorname, thresh, layer, x, y, w, h):
-    occlusion = [0]  # init
-    accumulation = [0]
     time = [0]
+    observed = []
 
     df_img_single = pd.DataFrame()
 
@@ -38,7 +42,7 @@ def occ_acc(filelist, colorname, thresh, layer, x, y, w, h):
 
         channelimg_l = crop[:, :, layer]  # Pull out correct layer
 
-        ret, array_bin = cv2.threshold(channelimg_l, thresh, 255, cv2.THRESH_BINARY)
+        array_bin = threshold_channel(channelimg_l, thresh) * 255
 
         img_to_save = np.zeros(crop.shape)
         color = [0, 0, 0]
@@ -47,15 +51,18 @@ def occ_acc(filelist, colorname, thresh, layer, x, y, w, h):
 
         df_img_single = df_img_single.append({'name': imgname + '_' + colorname, 'img': img_to_save}, ignore_index=True)
 
-        occ = np.sum(array_bin / 255)
         time.append(imgname)
-        occlusion.append(occ)
+        observed.append(np.sum(array_bin / 255))
 
-    # Calculate accumulation as change in occlusion between frames
-    for i in range(len(occlusion) - 1):
-        accumulation.append(occlusion[i + 1] - occlusion[i])
+    result = legacy_series_with_zero_baseline(observed)
 
-    return (colorname, time, occlusion, accumulation, df_img_single)
+    return (
+        colorname,
+        time,
+        result.values.tolist(),
+        result.changes.tolist(),
+        df_img_single,
+    )
 
 
 class RunOccAccROIAnalysis():

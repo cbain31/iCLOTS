@@ -4,13 +4,13 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from tests.support.accumulation_reference import (
+from iclotspython.core.accumulation import (
+    calibrated_area as pixel_count_to_area,
     column_occupancy,
     count_signal_pixels,
-    intended_percent_occlusion,
-    pixel_count_to_area,
     signed_sequential_changes,
 )
+from tests.support.accumulation_reference import intended_percent_occlusion
 
 
 pytestmark = pytest.mark.scientific

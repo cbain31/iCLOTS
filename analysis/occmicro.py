@@ -22,23 +22,20 @@ import matplotlib.pyplot as plt
 import datetime
 import shutil
 
+from iclotspython.core.accumulation import (
+    legacy_microchannel_map,
+    legacy_microchannel_series,
+    threshold_channel,
+)
+
 
 def analysis_math(df_img, mapbin_ext, filelist, umpix, layer, threshold, x, y, w, h):
     """Calculates occlusion and accumulation for desired RGB channel"""
 
-    # Create a numbered list of channels
-    lbl, nlbls = label(mapbin_ext)
-    rp = measure.regionprops_table(lbl, properties=('label', 'bbox', 'centroid'))
-    rp_df = pd.DataFrame(rp)
-    lab = rp_df['label']
-    x1 = rp_df['bbox-0']
-    x2 = rp_df['bbox-2']
-
     data_raw = []
     data = []
-    a0 = np.zeros(len(lab))  # List of channels zero long
+    signal_masks = []
     # Column index titles
-    # rng = range(self.w.get())
     rng = range(w)
     ypix_names = [str(a) for a in rng]
     col_names = ['Frame', 'Channel'] + ypix_names
@@ -54,8 +51,9 @@ def analysis_math(df_img, mapbin_ext, filelist, umpix, layer, threshold, x, y, w
 
         img_channel = crop[:, :, layer]
 
-        # Add image to array
-        ret, img_thresh = cv2.threshold(img_channel, threshold, 255, cv2.THRESH_BINARY)  # Red
+        signal_mask = threshold_channel(img_channel, threshold)
+        signal_masks.append(signal_mask)
+        img_thresh = signal_mask * 255
 
         # Layer
         map_save = np.dstack((mapbin_ext, mapbin_ext, mapbin_ext))
@@ -65,29 +63,26 @@ def analysis_math(df_img, mapbin_ext, filelist, umpix, layer, threshold, x, y, w
 
         df_img = df_img.append({'name': imgbasename, 'color': str(layer), 'img': map_save}, ignore_index=True)
 
-        for j in range(len(lab)):  # For each channel
-            # Index channel out of threshold image
-            channel = np.array(img_thresh[x1[j]:x2[j]][:])/255
-            # Sum along one axis and divide by height for a percent
-            occ_vector = np.sum(channel, axis=0)/channel.shape[0] * 100
-
-            # Mean percent occlusion across channel
-            occ_mean = np.mean(occ_vector)
-            # Max occlusion across channel
-            occ_max = np.max(occ_vector)
-            # Total area of signal
-            area_channel = np.sum(channel)
-            # Accumulation from previous frame
-            acc_channel = area_channel - a0[j]  # Subtract previous area
-
-            # Convert numbers to microns
-            area_um = area_channel * umpix * umpix
-            acc_um = acc_channel * umpix * umpix
-            data_raw.append([i, j] + occ_vector.tolist())
-            data.append([i, j, occ_mean, occ_max, area_channel, acc_channel, area_um, acc_um])
-
-            # Reset
-            a0[j] = area_channel
+    measurements = legacy_microchannel_series(
+        signal_masks, mapbin_ext, umpix
+    )
+    for result in measurements:
+        data_raw.append(
+            [result.frame, result.channel]
+            + result.column_occupancy_percent.tolist()
+        )
+        data.append(
+            [
+                result.frame,
+                result.channel,
+                result.mean_occlusion_percent,
+                result.max_occlusion_percent,
+                result.area_pixels,
+                result.accumulation_pixels,
+                result.area_micrometres_squared,
+                result.accumulation_micrometres_squared,
+            ]
+        )
 
     # Save and return as dataframes
     df_data_raw = pd.DataFrame(data_raw, columns=col_names)
@@ -127,24 +122,9 @@ class RunOccAccMicroAnalysis():
 
         crop = img[y:(y + h), x:(x + w), :]  # Create cropped image
 
-        # Generate map
-        # Create and display map
-        # Convert images to binary with thresholds, automatically uses all three colors
-        ret, img_th_red = cv2.threshold(crop[:, :, 2], rthresh, 255, cv2.THRESH_BINARY)  # Red
-        ret, img_th_green = cv2.threshold(crop[:, :, 1], gthresh, 255, cv2.THRESH_BINARY)  # Green
-        ret, img_th_blue = cv2.threshold(crop[:, :, 0], bthresh, 255, cv2.THRESH_BINARY)  # Blue
-
-        # Set up holder
-        # mapbin = np.zeros((self.h.get(), self.w.get()))
-        mapbin = np.zeros((h, w))
-        mapbin_ext = mapbin.copy()
-        # Threshold map
-        layered_arr = np.array([img_th_red, img_th_green, img_th_blue]).sum(axis=0)
-        mapbin[layered_arr >= 1] = 1
-        # Compress into one line
-        mapbin_1d = np.sum(mapbin, axis=1)
-        # Extend to width of channel
-        mapbin_ext[np.hstack(mapbin_1d * w) > 1] = 255
+        # Generate final-frame, all-layer horizontal geometry in the core.
+        thresholds = {"red": rthresh, "green": gthresh, "blue": bthresh}
+        mapbin_ext = legacy_microchannel_map(crop, thresholds) * 255
 
         graphs = plt.figure()
         graphs.suptitle(name, fontweight='bold')
@@ -300,9 +280,7 @@ class RunOccAccMicroAnalysis():
         img_th_red = None
         img_th_blue = None
         img_th_green = None
-        mapbin = None
         mapbin_ext = None
-        layered_arr = None
 
         # Raise toplevel to show graphs
         GraphTopLevel(graphimg)

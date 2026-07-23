@@ -23,6 +23,11 @@ import seaborn as sns
 import datetime
 import shutil
 
+from iclotspython.core.tracking import (
+    LegacyTrackingPolicy,
+    measure_legacy_tracks,
+)
+
 class RunBFSCTAnalysis():
 
     def __init__(self, filelist, frames_crop, frames_bgr, umpix, fps, maxdiameter, minintensity, search_range, min_dist, x, y, w, h):
@@ -54,52 +59,29 @@ class RunBFSCTAnalysis():
         # Filter stubs criteria requires a particle/cell to be present for at least three frames
         t_final = tp.filter_stubs(tr, 3)
 
-        # Series of vectors for final results dataframe
-        p_i = []  # Particle index
-        f_start = []  # Start frame, frame where cell first detected
-        f_end = []  # End frame, frame where cell last detected
-        dist = []  # Distance traveled
-        time = []  # Time for travel
-        sizes = []  # Cell size
         t_sdi = pd.DataFrame()  # Create dataframe
-        # For each particle, calculate RDI and save data for results dataframe:
-        for p in range(t_final['particle'].iloc[-1]):
-            df_p = tr[tr['particle'] == p]  # Region of trackpy dataframe corresponding to individual particle index
-            x_0 = df_p['x'].iloc[0]  # First x-position
-            x_n = df_p['x'].iloc[-1]  # Last x-position
-            y_0 = df_p['y'].iloc[0]  # First y-position
-            y_n = df_p['y'].iloc[-1]  # Last y-position
-            f_0 = df_p['frame'].iloc[0]  # First frame number
-            f_n = df_p['frame'].iloc[-1]  # Last frame number
-            s = df_p['mass'].mean() / 255  # Area of cell (pixels)
-            d = math.sqrt((x_n - x_0) ** 2 + (y_n - y_0) ** 2)  # Distance (pixels) - x direction only
-            t = (f_n - f_0) / float(self.fps.get())  # Time (seconds)
-            # Criteria to save cells as a valid data point:
-            # Must travel no less than 1/3 the length of channel
-            # Must travel no further than length of channel
-            if d > self.min_dist.get() / 3:
-                t_sdi = t_sdi.append(df_p, ignore_index=True)  # Save trackpy metrics
-                # Append data for particle/cell
-                p_i.append(p)
-                f_start.append(f_0)
-                f_end.append(f_n)
-                dist.append(d * float(self.umpix.get()))  # Convert to microns
-                time.append(t)
-                sizes.append(s)  # Background subtractor changes size of cell, size is a relative measurement
-
-        # Calculate sDI by dividing distance by time (um/sec)
-        sdi = []
-        sdi = np.asarray([u / v for u, v in zip(dist, time)])
+        measurements = measure_legacy_tracks(
+            t_final.to_dict("records"),
+            tr.to_dict("records"),
+            self.fps.get(),
+            self.umpix.get(),
+            LegacyTrackingPolicy.GENERAL,
+            self.min_dist.get(),
+        )
+        for result in measurements:
+            t_sdi = t_sdi.append(
+                tr[tr['particle'] == result.source_particle], ignore_index=True
+            )
 
         # Organize time, location, and RDI data in a list format
         df_video = pd.DataFrame(
-            {'Particle': p_i,
-             'Start frame': f_start,
-             'End frame': f_end,
-             'Transit time (s)': time,
-             'Distance traveled (\u03bcm)': dist,
-             'Velocity (\u03bcm/s)': sdi,
-             'Area (pix)': sizes
+            {'Particle': [result.source_particle for result in measurements],
+             'Start frame': [result.start_frame for result in measurements],
+             'End frame': [result.end_frame for result in measurements],
+             'Transit time (s)': [result.elapsed_seconds for result in measurements],
+             'Distance traveled (\u03bcm)': [result.distance_micrometres for result in measurements],
+             'Velocity (\u03bcm/s)': [result.velocity_micrometres_per_second for result in measurements],
+             'Area (pix)': [result.area_pixels for result in measurements]
              })
 
         # Renumber particles 0 to n

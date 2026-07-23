@@ -22,12 +22,17 @@ import matplotlib.pyplot as plt
 import datetime
 import shutil
 
+from iclotspython.core.accumulation import (
+    legacy_percent_occlusion,
+    legacy_series_with_zero_baseline,
+    threshold_channel,
+)
+
 
 def occ_acc(filelist, map_color, colorname, thresh, layer, x, y, w, h):
-    occlusion = [0]  # init
     occlusion_percent = [0]
-    accumulation = [0]
     time = [0]
+    observed = []
 
     df_img_single = pd.DataFrame()
 
@@ -39,7 +44,8 @@ def occ_acc(filelist, map_color, colorname, thresh, layer, x, y, w, h):
 
         channelimg_l = crop[:, :, layer]  # Pull out correct layer
 
-        ret, array_bin = cv2.threshold(channelimg_l, thresh, 255, cv2.THRESH_BINARY)
+        signal_mask = threshold_channel(channelimg_l, thresh)
+        array_bin = signal_mask * 255
 
         img_to_save = map_color.copy()
         color = [0, 0, 0]
@@ -48,17 +54,22 @@ def occ_acc(filelist, map_color, colorname, thresh, layer, x, y, w, h):
 
         df_img_single = df_img_single.append({'name': imgname + '_' + colorname, 'img': img_to_save}, ignore_index=True)
 
-        occ = np.sum(array_bin / 255)
-        occ_per = np.sum(array_bin/np.sum(map_color[:, :, 0])) * 100 # 3 layer color cpu
+        occ = np.sum(signal_mask)
+        occ_per = legacy_percent_occlusion(signal_mask, map_color[:, :, 0])
         time.append(imgname)
-        occlusion.append(occ)
+        observed.append(occ)
         occlusion_percent.append(occ_per)
 
-    # Calculate accumulation as change in occlusion between frames
-    for i in range(len(occlusion) - 1):
-        accumulation.append(occlusion[i + 1] - occlusion[i])
+    result = legacy_series_with_zero_baseline(observed)
 
-    return (colorname, time, occlusion, occlusion_percent, accumulation, df_img_single)
+    return (
+        colorname,
+        time,
+        result.values.tolist(),
+        occlusion_percent,
+        result.changes.tolist(),
+        df_img_single,
+    )
 
 
 class RunOccAccDeviceAnalysis():

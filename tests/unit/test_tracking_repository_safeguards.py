@@ -49,7 +49,11 @@ def test_importing_tracking_reference_does_not_load_tkinter_trackpy_or_opencv():
         "analysis/adhvideo.py",
     ],
 )
-def test_primary_and_softwareonly_tracking_modules_remain_byte_identical(relative_path):
-    primary = ROOT / relative_path
-    duplicate = ROOT / "iCLOTS_softwareonly" / relative_path
-    assert primary.read_bytes() == duplicate.read_bytes()
+def test_modernized_tracking_adapters_diverge_and_delegate_to_core(relative_path):
+    primary = (ROOT / relative_path).read_text(encoding="utf-8")
+    duplicate = (ROOT / "iCLOTS_softwareonly" / relative_path).read_text(
+        encoding="utf-8"
+    )
+    assert primary != duplicate
+    assert "from iclotspython.core.tracking import" in primary
+    assert "iclotspython.core" not in duplicate
