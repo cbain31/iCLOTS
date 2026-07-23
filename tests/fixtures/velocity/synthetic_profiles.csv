@@ -1,0 +1,16 @@
+profile,position,velocity
+plug,-3,10
+plug,-2,10
+plug,-1,10
+plug,0,10
+plug,1,10
+plug,2,10
+plug,3,10
+parabolic,-3,1
+parabolic,-2,6
+parabolic,-1,9
+parabolic,0,10
+parabolic,1,9
+parabolic,2,6
+parabolic,3,1
+
