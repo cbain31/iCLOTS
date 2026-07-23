@@ -1,0 +1,8 @@
+# Phase 3 modern desktop development dependencies.
+# Packaging and installer metadata remain Phase 4 work.
+numpy>=1.26,<3
+# 6.11.1 currently fails to load QtCore in the supported Windows/Anaconda
+# development environment; keep the tested Qt 6.9 line until Phase 4.
+PySide6>=6.9,<6.10
+matplotlib>=3.8,<4
+openpyxl>=3.1,<4
