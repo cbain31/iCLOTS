@@ -1,0 +1,21 @@
+iCLOTS velocity reproduction environment
+Generated: 2026-07-22 America/New_York
+Environment path: C:\Users\cbain\AppData\Local\Temp\iclots_velocity_reproduction_env
+Python: 3.12.13 (main, Mar  3 2026, 15:01:35) [MSC v.1944 64 bit (AMD64)]
+Platform: Windows-11-10.0.26200-SP0
+OpenCV: 5.0.0
+NumPy: 2.3.5
+pandas: 3.0.1
+openpyxl: 3.1.5
+Matplotlib: 3.11.1
+Pillow: 12.2.0
+OpenCV threads forced: 1
+OpenCV video backend: FFMPEG
+FFMPEG:                      YES (prebuilt binaries)
+avcodec:                   YES (61.19.100)
+avformat:                  YES (61.7.100)
+avutil:                    YES (59.39.100)
+CLI ffmpeg/ffprobe: unavailable on PATH
+Installed specifically for this audit: opencv-python-headless==5.0.0.93; matplotlib==3.11.1
+Inherited from bundled runtime via --system-site-packages: NumPy, pandas, openpyxl, Pillow
+No project dependency or application environment was modified.

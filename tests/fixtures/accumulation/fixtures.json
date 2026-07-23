@@ -1,0 +1,46 @@
+{
+  "conventions": {
+    "array_order": "row-major",
+    "rgb_object_keys": ["red", "green", "blue"],
+    "production_storage_order": "BGR",
+    "threshold": 50,
+    "micrometres_per_pixel": 0.5
+  },
+  "threshold_values": [49, 50, 51],
+  "empty_mask": [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
+  "full_mask": [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]],
+  "single_positive": [[0, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0]],
+  "increasing_masks": [
+    [[1, 0, 0], [0, 0, 0]],
+    [[1, 1, 0], [0, 0, 0]],
+    [[1, 1, 1], [0, 0, 0]]
+  ],
+  "decreasing_masks": [
+    [[1, 1, 1], [0, 0, 0]],
+    [[1, 1, 0], [0, 0, 0]],
+    [[1, 0, 0], [0, 0, 0]]
+  ],
+  "identical_masks": [
+    [[1, 0], [0, 1]],
+    [[1, 0], [0, 1]]
+  ],
+  "overlapping_rgb": {
+    "red": [[1, 0], [0, 0]],
+    "green": [[1, 0], [0, 0]],
+    "blue": [[0, 0], [0, 0]]
+  },
+  "disjoint_rgb": {
+    "red": [[1, 0, 0], [0, 0, 0]],
+    "green": [[0, 1, 0], [0, 0, 0]],
+    "blue": [[0, 0, 1], [0, 0, 0]]
+  },
+  "irregular_device": [[1, 1, 0, 0], [1, 0, 0, 1], [1, 1, 1, 1]],
+  "disconnected_device": [[1, 0, 0, 0, 1], [1, 0, 0, 0, 1], [0, 0, 0, 0, 0]],
+  "straight_microchannel": [[0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]],
+  "multiple_horizontal_microchannels": [[1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]],
+  "broken_microchannel_walls": [[0, 0, 0, 0, 0, 0], [1, 1, 0, 1, 1, 0], [1, 0, 1, 0, 1, 0], [0, 0, 0, 0, 0, 0]],
+  "zero_area_device": [[0, 0, 0], [0, 0, 0]],
+  "known_column_signal": [[1, 0, 1, 0], [1, 1, 0, 0]],
+  "filenames": ["frame1.png", "frame10.png", "frame2.png", "frame01.jpg", "frame02.jpg"]
+}
+
