@@ -18,6 +18,12 @@ import matplotlib.pyplot as plt
 import datetime
 import shutil
 
+from iclotspython.core.velocity import (
+    accepted_point_measurements,
+    frame_summary,
+    velocity_profile,
+)
+
 class RunVelocityAnalysis():
 
     def __init__(self, filelist, umpix, fps, n_bins, n_points, block_size, winsize_x, winsize_y, x, y, w, h):
@@ -107,19 +113,16 @@ class RunVelocityAnalysis():
                     good_new = p1[st == 1]
                     good_old = p0[st == 1]
 
+                    core_frames, core_positions, core_velocities = accepted_point_measurements(
+                        count, good_old, good_new, fps, umpix
+                    )
+                    frames.extend(core_frames.tolist())
+                    positions.extend(core_positions.tolist())
+                    velocities.extend(core_velocities.tolist())
+
                     for i, (new, old) in enumerate(zip(good_new, good_old)):
                         a, b = new.ravel()
                         c, d = old.ravel()
-
-                        # Calculate displacement/velocity
-                        vel = np.sqrt(
-                            (new[0] - old[0]) ** 2 + (new[1] - old[1]) ** 2) * float(fps) * float(umpix)  # With y displacement
-                        # vel = (new[0] - old[0]) * fps * umpix  # Ignore y displacement
-
-                        # Save frame, position, displacement
-                        frames.append(count)
-                        positions.append(new[1])
-                        velocities.append(vel)
 
                         # Save first 100 images
                         if count < 100:
@@ -148,29 +151,22 @@ class RunVelocityAnalysis():
         dict_csv = {'Frame': frames, 'Channel pos. (pix)': positions, 'Velocity (\u03bcm/s)': velocities}
         self.data_all = pd.DataFrame(dict_csv)  # Convert to dictionary
 
-        # Save minimum, mean, and maximum values per frame to an excel sheet
-        # Group all tracked points by frame, take mean
-        by_frame_min = self.data_all.groupby('Frame').min()
-        by_frame_mean = self.data_all.groupby('Frame').mean()
-        by_frame_max = self.data_all.groupby('Frame').max()
-
-        by_frame_timepoint = np.linspace(0, len(by_frame_min), len(by_frame_min)) / float(fps)
+        summary = frame_summary(frames, velocities, fps)
+        by_frame_timepoint = summary.time_seconds
 
         self.data_frame = pd.DataFrame({'Time (s)': by_frame_timepoint,
-                                           'Min. velocity (\u03bcm/s)': by_frame_min['Velocity (\u03bcm/s)'],
-                                           'Mean velocity (\u03bcm/s)': by_frame_mean['Velocity (\u03bcm/s)'],
-                                           'Max. velocity (\u03bcm/s)': by_frame_max['Velocity (\u03bcm/s)']})
+                                           'Min. velocity (\u03bcm/s)': summary.minimum,
+                                           'Mean velocity (\u03bcm/s)': summary.mean,
+                                           'Max. velocity (\u03bcm/s)': summary.maximum})
 
         # Calculate profiles based on all events, height of channel, n bins
         # Create a profile
-        bins = np.linspace(0, self.h_a, self.n_bins_a+1)
-        bins_um = bins * float(umpix)  # For graphing
-        digitized = np.digitize(self.data_all['Channel pos. (pix)'], bins)  # Bins
-        profile = [self.data_all['Velocity (\u03bcm/s)'][digitized == i].mean() for i in range(1, len(bins))]
-
-        # Create a profile (standard deviation)
-        digitized = np.digitize(self.data_all['Channel pos. (pix)'], bins)  # Bins
-        profile_stdev = [self.data_all['Velocity (\u03bcm/s)'][digitized == i].std() for i in range(1, len(bins))]
+        profile_result = velocity_profile(
+            positions, velocities, self.h_a, self.n_bins_a, umpix
+        )
+        bins_um = np.concatenate(([0.0], profile_result.upper_edges))
+        profile = profile_result.mean
+        profile_stdev = profile_result.standard_deviation
 
         # Save
         self.profile_data = pd.DataFrame({'Bin coordinate (\u03bcm)': bins_um[1:],
@@ -197,9 +193,9 @@ class RunVelocityAnalysis():
         graphs_tc = plt.figure(figsize=(6, 4), dpi=80)
         graphs_tc.suptitle(self.video_basename, fontweight='bold')
 
-        plt.scatter(by_frame_timepoint, by_frame_min['Velocity (\u03bcm/s)'], color='springgreen', label='Min.')
-        plt.scatter(by_frame_timepoint, by_frame_mean['Velocity (\u03bcm/s)'], color='dodgerblue', label='Mean')
-        plt.scatter(by_frame_timepoint, by_frame_max['Velocity (\u03bcm/s)'], color='tomato', label='Max.')
+        plt.scatter(by_frame_timepoint, summary.minimum, color='springgreen', label='Min.')
+        plt.scatter(by_frame_timepoint, summary.mean, color='dodgerblue', label='Mean')
+        plt.scatter(by_frame_timepoint, summary.maximum, color='tomato', label='Max.')
         plt.xlabel('Time (s)')
         plt.ylabel('Velocity (\u03bcm/s)')
         plt.legend()

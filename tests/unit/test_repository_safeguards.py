@@ -63,8 +63,12 @@ def test_importing_pure_velocity_support_does_not_load_tkinter():
     assert result.returncode == 0, result.stderr
 
 
-def test_primary_and_softwareonly_velocity_modules_remain_byte_identical():
-    primary = (ROOT / "analysis/velocity.py").read_bytes()
-    duplicate = (ROOT / "iCLOTS_softwareonly/analysis/velocity.py").read_bytes()
-    assert primary == duplicate
+def test_modernized_velocity_adapter_diverges_and_delegates_to_core():
+    primary = (ROOT / "analysis/velocity.py").read_text(encoding="utf-8")
+    duplicate = (
+        ROOT / "iCLOTS_softwareonly/analysis/velocity.py"
+    ).read_text(encoding="utf-8")
+    assert primary != duplicate
+    assert "from iclotspython.core.velocity import" in primary
+    assert "iclotspython.core" not in duplicate
 

@@ -23,6 +23,11 @@ import seaborn as sns
 import datetime
 import shutil
 
+from iclotspython.core.tracking import (
+    LegacyTrackingPolicy,
+    measure_legacy_tracks,
+)
+
 class RunBFDefAnalysis():
 
     def __init__(self, filelist, frames_crop, umpix, fps, maxdiameter, minintensity, maxintensity, x, y, w, h):
@@ -53,53 +58,30 @@ class RunBFDefAnalysis():
         # Filter stubs criteria requires a particle/cell to be present for at least ten frames
         t_final = tp.filter_stubs(tr, 10)
 
-        # Series of vectors for final results dataframe
-        p_i = []  # Particle index
-        f_start = []  # Start frame, frame where cell first detected
-        f_end = []  # End frame, frame where cell last detected
-        dist = []  # Distance traveled
-        time = []  # Time for travel
-        sizes = []  # Cell size
-        circ = []  # Circularity
         self.t_tt = pd.DataFrame()  # Create dataframe
-        # For each particle, calculate RDI and save data for results dataframe:
-        for p in range(t_final['particle'].iloc[-1]):
-            df_p = tr[tr['particle'] == p]  # Region of trackpy dataframe corresponding to individual particle index
-            x_0 = df_p['x'].iloc[0]  # First x-position
-            x_n = df_p['x'].iloc[-1]  # Last x-position
-            f_0 = df_p['frame'].iloc[0]  # First frame number
-            f_n = df_p['frame'].iloc[-1]  # Last frame number
-            s = df_p['mass'].mean() / 255  # Area of cell (pixels)
-            d = (x_n - x_0)  # Distance
-            t = (f_n - f_0) / float(self.fps.get())  # Time (seconds)
-            c = df_p['ecc'].mean()
-            # Criteria to save cells as a valid data point:
-            # Must travel no further than length of channel
-            if d < self.w.get():
-                self.t_tt = self.t_tt.append(df_p, ignore_index=True)  # Save trackpy metrics
-                # Append data for particle/cell
-                p_i.append(p)
-                f_start.append(f_0)
-                f_end.append(f_n)
-                dist.append(d * float(self.umpix.get()))
-                time.append(t)
-                sizes.append(s * float(self.umpix.get()) * float(self.umpix.get()))
-                circ.append(c)
-
-        # Calculate sDI by dividing distance by time (um/sec)
-        transit_time = []
-        transit_time = np.asarray([u / v for u, v in zip(dist, time)])
+        measurements = measure_legacy_tracks(
+            t_final.to_dict("records"),
+            tr.to_dict("records"),
+            self.fps.get(),
+            self.umpix.get(),
+            LegacyTrackingPolicy.TRANSIENT_ADHESION,
+            self.w.get(),
+        )
+        for result in measurements:
+            self.t_tt = self.t_tt.append(
+                tr[tr['particle'] == result.source_particle], ignore_index=True
+            )
 
         # Organize time, location, and speed data in a list format
         self.df_video = pd.DataFrame(
-            {'Particle': p_i,
-             'Start frame': f_start,
-             'End frame': f_end,
-             'Transit time (s)': time,
-             'Distance traveled (\u03bcm)': dist,
-             'Avg. velocity (\u03bcm/s)': transit_time,
-             'Area (\u03bcm\u00b2)': sizes,  # Convert to microns^2
-             'Circularity (a.u.)': circ
+            {'Particle': [result.source_particle for result in measurements],
+             'Start frame': [result.start_frame for result in measurements],
+             'End frame': [result.end_frame for result in measurements],
+             'Transit time (s)': [result.elapsed_seconds for result in measurements],
+             'Distance traveled (\u03bcm)': [result.distance_micrometres for result in measurements],
+             'Avg. velocity (\u03bcm/s)': [result.velocity_micrometres_per_second for result in measurements],
+             'Area (\u03bcm\u00b2)': [result.area_micrometres_squared for result in measurements],
+             'Circularity (a.u.)': [result.circularity for result in measurements]
              })
 
         # Renumber particles 0 to n

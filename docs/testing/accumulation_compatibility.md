@@ -1,6 +1,6 @@
 # Accumulation and occlusion compatibility policy
 
-This Phase 1 specification separates checked-out numerical behavior from GUI/help terminology, scientific invariants, and unresolved workflow decisions. The synthetic helpers are executable references, not production replacements.
+This Phase 1 specification separates checked-out numerical behavior from GUI/help terminology, scientific invariants, and unresolved workflow decisions. The synthetic helpers remain independent executable references. Phase 2 production calculations now live in `iclotspython.core.accumulation` and are parity-tested against these helpers.
 
 ## Cross-workflow comparison
 
