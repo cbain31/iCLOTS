@@ -6,6 +6,8 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 
 from iclotspython.presentation import ROIAccumulationResult, roi_plot_series
+from iclotspython.presentation.workflows import WorkflowResult
+from iclotspython.output.workflows import create_workflow_figure
 
 
 class ROIPlotCanvas(FigureCanvasQTAgg):
@@ -32,6 +34,14 @@ class ROIPlotCanvas(FigureCanvasQTAgg):
         self.draw()
 
     def set_result(self, result: ROIAccumulationResult) -> None:
+        if isinstance(result, WorkflowResult):
+            source = create_workflow_figure(result)
+            # Reuse the same canvas and its Qt parent.
+            self.figure.clear()
+            self.figure = source
+            source.set_canvas(self)
+            self.draw()
+            return
         self.figure.clear()
         area_axis, accumulation_axis = self.figure.subplots(1, 2)
         for series in roi_plot_series(result):
