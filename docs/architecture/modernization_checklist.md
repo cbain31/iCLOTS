@@ -130,3 +130,24 @@ pixels; the modern service rejects that case and its navigation remains disabled
 See `docs/testing/scientific_issue_register.md` (SCI-001). Correction needs
 collaborator methodology review. Labeled video export and historical
 feature-level reproduction remain incomplete. Next: static analysis and packaging.
+
+### M4 — Static adhesion and filopodia
+
+Added a lazy, headless `core/adhesion.py`, static application service and three
+screens. Independent specimen images may differ in dimensions; same-field
+accumulation still requires equal dimensions. The static outputs retain strict
+area bounds, texture population SD, conditional full functional-intensity sums,
+TrackPy radius-derived area, eccentricity under the original circularity label,
+and the legacy nonsquare filopodia coordinate convention. These conventions are
+visible in result warnings. Image/combined density and descriptive tables are
+exported with parameters and environment versions.
+
+Executed the adhesion unit/GUI/shell tests: **16 passed**. Independent reference
+uses original OpenCV thresholding and regionprops_table; production uses region
+objects. Synthetic numerical comparisons pass at 1e-12 relative tolerance.
+All three complete local adhesion image groups passed GUI and CSV/XLSX/PNG
+export tests: **3 passed**; source snapshots were unchanged. Ten modern scientific
+screens are enabled. Colored-image grayscale decoding may differ from legacy
+codec-specific imread behavior, and TIFF page selection remains first-page only;
+image-file-level historical parity is not asserted. Labeled images remain to
+be migrated. Next: clustering, packaging and final validation.

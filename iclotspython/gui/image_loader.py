@@ -56,7 +56,7 @@ def qimage_to_rgb_array(image: QImage) -> NDArray[np.uint8]:
     return array
 
 
-def load_image_files(paths: tuple[str, ...] | list[str]) -> LoadedImages:
+def load_image_files(paths: tuple[str, ...] | list[str], *, require_same_dimensions=True) -> LoadedImages:
     """Load images in the exact supplied order and validate dimensions."""
     if not paths:
         raise ImageLoadingError(
@@ -94,7 +94,7 @@ def load_image_files(paths: tuple[str, ...] | list[str]) -> LoadedImages:
         dimensions = (image.width(), image.height())
         if expected is None:
             expected = dimensions
-        elif dimensions != expected:
+        elif require_same_dimensions and dimensions != expected:
             raise ImageLoadingError(
                 "inconsistent_image_dimensions",
                 "All ROI images must have identical dimensions.",
