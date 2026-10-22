@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import replace
 from pathlib import Path
 
-from PySide6.QtWidgets import QCheckBox, QComboBox, QFormLayout, QGroupBox, QMessageBox, QSpinBox
+from PySide6.QtWidgets import QCheckBox, QComboBox, QFormLayout, QGroupBox, QLabel, QMessageBox, QSpinBox, QVBoxLayout, QWidget
 
 from iclotspython.application.common import Region
 from iclotspython.application.contracts import ColorChannel
@@ -43,9 +43,13 @@ class WorkflowScreen(ROIAccumulationScreen):
         tabs = super()._build_results()
         self.table_selector = QComboBox()
         self.table_selector.currentTextChanged.connect(self._select_table)
-        # A corner selector leaves the established table/plot/export tabs intact.
-        tabs.setCornerWidget(self.table_selector)
-        return tabs
+        container = QWidget()
+        layout = QVBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(QLabel("Result table"))
+        layout.addWidget(self.table_selector)
+        layout.addWidget(tabs, 1)
+        return container
 
     def region(self):
         if self.crop_enabled.isChecked():

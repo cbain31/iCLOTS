@@ -1,5 +1,26 @@
-# iCLOTS_software
-iCLOTS software source code
+# iCLOTS
+
+The **2.0.0a1 modernization preview** provides a PySide6 desktop application with
+ROI, device and microchannel accumulation; velocity profiling; general tracking,
+deformability and transient adhesion; static brightfield/fluorescence adhesion;
+filopodia; and clustering. Scientific compatibility policies and result metadata
+are explicit. Fluorescence video tracking awaits review of a reproduced legacy
+preprocessing defect; video utilities and some image/plot exports remain legacy.
+
+```powershell
+python -m pip install ".[desktop,analysis]"
+python -m iclotspython
+```
+
+Use Python 3.11–3.12. See the [installation guide](docs/installation.md),
+[modern GUI guide](docs/gui/README.md), [test guide](docs/testing/README.md),
+[implementation checklist](docs/architecture/modernization_checklist.md) and
+[scientific issue register](docs/testing/scientific_issue_register.md).
+This is an alpha preview, not a signed standalone release or clinical validation.
+The original launcher (`python iCLOTS.py`) and historical software-only snapshot
+are preserved in the checkout. The text below describes the historical release.
+
+## Historical iCLOTS software release
 
 Standalone software v0.1.0 is available now at https://www.iCLOTS.org/software
 We are in the processing of submitting a manuscript describing iCLOTS for peer review, look out for a publication soon! In the meantime...

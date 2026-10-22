@@ -138,6 +138,6 @@ def run_tracking(request: TrackingRequest, progress=None, is_cancelled=None):
                   ("distance_threshold_pixels", minimum_distance), ("roi", request.roi),
                   ("preprocessing", "grayscale" if policy is LegacyTrackingPolicy.TRANSIENT_ADHESION else "MOG2 detectShadows=False; MORPH_CLOSE 5x5; legacy division for fluorescence"))
     provenance = (("contract_version", "1.0"), ("scientific_policy", "legacy-compatible"), ("scientific_core", "iclotspython.core.tracking"),
-                  ("source", source_id(request.video)), ("decoded_frames", len(processed)), ("environment", environment_versions("opencv-python", "trackpy", "pandas", "scipy")))
+                  ("source", source_id(request.video)), ("decoded_frames", len(processed)), ("environment", environment_versions("opencv-python", "trackpy", "pandas", "scipy", "numba")))
     checkpoint(workflow, progress, is_cancelled, 1, 1, "Analysis complete")
     return WorkflowResult(workflow, tables, (plot,), parameters, provenance, tuple(warnings), source_name(request.video))

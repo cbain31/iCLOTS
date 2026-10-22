@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import re
 
+from iclotspython import __version__
+
 from iclotspython.core import accumulation as accumulation_core
 from iclotspython.presentation.models import (
     ChannelAccumulationSeries,
@@ -30,7 +32,7 @@ from .validation import validate_roi_accumulation_request
 
 WORKFLOW_ID = "roi_accumulation"
 CONTRACT_VERSION = "1.0"
-APPLICATION_VERSION = "unversioned"
+APPLICATION_VERSION = __version__
 
 _CHANNEL_INDEX = {
     ChannelConvention.BGR: {

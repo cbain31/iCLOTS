@@ -20,6 +20,7 @@ class PlotPanel:
     x_label: str
     y_label: str
     series: tuple[PlotSeries, ...]
+    kind: str = "line"
 
 
 @dataclass(frozen=True)

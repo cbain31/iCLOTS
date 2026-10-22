@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QFormLayout,
     QGroupBox,
+    QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -113,7 +114,7 @@ class ROIAccumulationScreen(QWidget):
 
         input_group = QGroupBox("1. Input images")
         input_layout = QVBoxLayout(input_group)
-        button_row = QHBoxLayout()
+        button_row = QGridLayout()
         self.add_button = QPushButton("Add images…")
         self.add_button.setObjectName("add_images_button")
         self.remove_button = QPushButton("Remove selected")
@@ -122,13 +123,13 @@ class ROIAccumulationScreen(QWidget):
         self.clear_button.setObjectName("clear_inputs_button")
         self.demo_button = QPushButton("Load synthetic demo")
         self.demo_button.setObjectName("load_demo_button")
-        for button in (
+        for index, button in enumerate((
             self.add_button,
             self.remove_button,
             self.clear_button,
             self.demo_button,
-        ):
-            button_row.addWidget(button)
+        )):
+            button_row.addWidget(button, index // 2, index % 2)
         input_layout.addLayout(button_row)
         self.image_list = QListWidget()
         self.image_list.setObjectName("ordered_image_list")
@@ -271,7 +272,7 @@ class ROIAccumulationScreen(QWidget):
         self.warning_text.setObjectName("warnings_provenance")
         self.warning_text.setReadOnly(True)
         self.warning_text.setPlainText("No warnings or provenance")
-        self.result_tabs.addTab(self.warning_text, "Warnings & provenance")
+        self.result_tabs.addTab(self.warning_text, "Warnings && provenance")
 
         export_widget = QWidget()
         export_layout = QVBoxLayout(export_widget)
@@ -576,7 +577,9 @@ class ROIAccumulationScreen(QWidget):
     def _on_success(self, result: ROIAccumulationResult) -> None:
         if self._running_revision != self._revision:
             self.progress_message.setText("Inputs changed; run analysis again")
+            self.validation_feedback.setText("Inputs changed; run analysis again.")
             return
+        self.validation_feedback.setText("")
         self._apply_result(result)
         self.progress_bar.setValue(100)
         self.progress_message.setText("Analysis complete")
@@ -775,7 +778,7 @@ class ROIAccumulationScreen(QWidget):
                     f"• {record.format.upper()} — {record.status.value}: {record.path}"
                 )
                 for issue in record.issues:
-                    lines.append(f"  [{issue.code}] {issue.message}")
+                    lines.append(f"  [{issue.code}] {issue.message}\n  {issue.detail}")
         overall = {
             manifest.status for manifest in manifests
         }

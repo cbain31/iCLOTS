@@ -129,6 +129,6 @@ def run_adhesion(request: AdhesionRequest, progress=None, is_cancelled=None):
     plots = (PlotPanel("Cell area", "Cell (combined index)", "Area (µm²)", (PlotSeries("Area", "", "area", tuple(map(float, range(len(rows)))), tuple(r[5] for r in rows), "cell", "µm²"),)),)
     parameters = tuple((field, getattr(request, field)) for field in request.__dataclass_fields__ if field != "images") + (("micrometres_per_pixel", calibration), ("channel_convention", validated.channel_convention.value))
     provenance = (("contract_version", "1.0"), ("scientific_policy", "legacy-compatible"), ("scientific_core", "iclotspython.core.adhesion"),
-                  ("sources", validated.metadata.source_identifiers), ("environment", environment_versions("opencv-python", "scikit-image", "trackpy")))
+                  ("sources", validated.metadata.source_identifiers), ("environment", environment_versions("opencv-python", "scikit-image", "trackpy", "numba")))
     checkpoint(workflow, progress, is_cancelled, 1, 1, "Analysis complete")
     return WorkflowResult(workflow, tables, plots, parameters, provenance, tuple(warnings), _export_stem(request.images))

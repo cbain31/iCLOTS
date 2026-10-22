@@ -48,16 +48,16 @@ does not constitute a complete modern workflow.
   by reproduced SCI-001). Acceptance: preserve preprocessing,
   TrackPy batch/link/filter parameters, exclusive particle enumeration and
   endpoint policies; test orchestration and scientific results independently.
-- [ ] Assess remaining static adhesion/filopodia/clustering/utility migration.
+- [x] Assess remaining static adhesion/filopodia/clustering/utility migration.
   Production activation requires implemented, independently tested workflows;
   ambiguous scientific behavior must be recorded without silent correction.
-- [ ] Package the modern application. Acceptance: wheel builds and installs,
+- [x] Package the modern application. Acceptance: wheel builds and installs,
   package imports/entrypoint work outside the repository; GUI remains optional
   for headless numerical use; source datasets/legacy snapshot excluded.
-- [ ] Execute full and configured opt-in tests, update user/developer docs,
+- [x] Execute full and configured opt-in tests, update user/developer docs,
   record validation matrix, scientific differences, limitations and phase 5–6
   proposals. Preserve read-only source-data integrity checks.
-- [ ] Commit focused milestones and open review PRs when authenticated platform
+- [x] Commit focused milestones and open review PRs when authenticated platform
   access is available. Never merge without user approval.
 
 ## Validation and reporting policy
@@ -101,8 +101,9 @@ not historical parity. Labeled-image exports and interactive visual ROI drawing
 remain future work (explicit crop coordinates work).
 
 The sandbox's default pytest temporary-directory location is unwritable in some
-runs; an ignored `.pytest_cache` basetemp was used. GitHub CLI authentication is
-invalid, so remote PR creation is not currently available through that CLI.
+runs; an ignored `.pytest_cache` basetemp was used. The initial sandboxed GitHub
+CLI authentication check failed. A later network-enabled check succeeded;
+the CLI created draft PRs after the connector's PR write was denied with HTTP 403.
 
 ### M3 — Velocity and video tracking
 
@@ -170,3 +171,50 @@ the checked-in KMeans constructor in scikit-learn 1.4.2. Local commands set
 this is an execution setting, not an application parameter default. The modern
 screen plots the first selected feature pair and exports correlations; exhaustive
 pairplots and mosaic images remain unmigrated. Eleven scientific screens enabled.
+
+### M6 — Packaging, usability, documentation and final review
+
+Added installable 2.0.0a1 metadata, extras, dependency recipes, lazy CLI/version/
+environment diagnostics, wheel/sdist build configuration and Windows/Ubuntu
+CI configuration. Package archives exclude datasets and historical trees. Wheel
+installation into the ignored venv, imports outside the checkout, console version
+and construction of eleven screens passed. Initial checks reused system scientific
+libraries. A subsequent isolated venv installed the wheel and all extras without
+system site packages; all eleven installed screens completed demo/worker/exports,
+and its ordinary suite passed **305 tests, 17 deselected**. The resolved 41-package
+inventory is committed under `../testing/environments/`. A 980-numeric-cell
+synthetic cross-environment probe had maximum absolute drift 1.11e-16 and zero
+failures at 1e-6 relative / 1e-9 absolute tolerance; unseeded scree was excluded.
+
+Visual review found no Qt system fonts in the restricted offscreen environment.
+Added a conditional fallback to the existing Matplotlib DejaVu font and tested
+it in a fresh process. Inspected readable 1280x820 accumulation/clustering images;
+reflowed input buttons/table selection and fixed stale running-status feedback.
+Clustering feature-pair plots now use scatter marks. ROI provenance records the
+actual release version; its previous unversioned assertion was updated.
+
+Final complete ordinary run, with the local-data environment variable also set:
+`.venv/Scripts/python -m pytest -q --basetemp=.pytest_cache/final-full-3`:
+**305 passed, 17 deselected**. Explicit local selection without the variable:
+**17 skipped, 305 deselected**. Four packaging tests passed again after constraining
+the analysis extra to the validated NumPy 1.26.4 binary runtime.
+The configured combined local run passed **17 tests** (303 deselected), with
+unchanged source hashes. This run preceded only font/layout/presentation repairs;
+the ordinary GUI tests were rerun after those repairs. Missing-data behavior is
+also checked explicitly. Upstream warnings and scientific limitations are in
+`../modernization_summary.md`. SCI-002 now reproduces the unchanged legacy
+normalization loop modifying row three rather than color planes.
+
+Updated README, installation, GUI/test/developer guides, current phase references,
+publication-planning summary and isolated Phase 5–6 proposals. No new assay or
+clinical feature was added. Outstanding release gates are explicit, including
+fluorescence methodology, legacy utilities, labeled exports and signed installers.
+
+Review stack (all draft, none merged):
+
+1. ROI lifecycle: https://github.com/cbain31/iCLOTS/pull/4
+2. Accumulation: https://github.com/cbain31/iCLOTS/pull/5
+3. Video workflows: https://github.com/cbain31/iCLOTS/pull/6
+4. Static adhesion: https://github.com/cbain31/iCLOTS/pull/7
+5. Clustering: https://github.com/cbain31/iCLOTS/pull/8
+6. Packaging/documentation: created after this milestone commit.

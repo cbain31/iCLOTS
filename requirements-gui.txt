@@ -1,5 +1,5 @@
-# Phase 3 modern desktop development dependencies.
-# Packaging and installer metadata remain Phase 4 work.
+# Desktop/output dependencies; install requirements-analysis.txt for every
+# enabled scientific workflow. Package extras are declared in pyproject.toml.
 numpy>=1.26,<3
 # 6.11.1 currently fails to load QtCore in the supported Windows/Anaconda
 # development environment; keep the tested Qt 6.9 line until Phase 4.

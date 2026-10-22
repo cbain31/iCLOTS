@@ -79,3 +79,14 @@ def test_canonical_entrypoint_and_optional_dependency_file_exist():
     assert "PySide6>=6.9,<6.10" in requirements
     assert "matplotlib" in requirements
     assert "openpyxl" in requirements
+
+
+def test_font_fallback_when_system_fonts_are_unavailable():
+    completed = _fresh_process(
+        "from PySide6.QtGui import QFontDatabase; "
+        "QFontDatabase.families=staticmethod(lambda: []); "
+        "from iclotspython.gui.application import create_application; "
+        "app=create_application([]); "
+        "assert app.font().family() == 'DejaVu Sans'"
+    )
+    assert completed.returncode == 0, completed.stderr

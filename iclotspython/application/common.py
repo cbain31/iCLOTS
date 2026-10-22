@@ -7,6 +7,8 @@ import importlib.metadata
 import math
 import platform
 
+from iclotspython import __version__
+
 from .errors import RequestValidationError, WorkflowCancelled
 from .progress import ProgressEvent, ProgressStage
 
@@ -63,7 +65,7 @@ def checkpoint(workflow, callback, cancelled, current, total, message):
 
 
 def environment_versions(*dependencies):
-    versions = [("python", platform.python_version())]
+    versions = [("iclots", __version__), ("python", platform.python_version())]
     for name in ("numpy", *dependencies):
         try:
             versions.append((name, importlib.metadata.version(name)))

@@ -1,7 +1,9 @@
 # Phase 3 roadmap
 
-The phases below remain separate validation gates. Completing an earlier phase
-does not authorize implementation of a later phase.
+The phases below describe the historical incremental plan. The 2026-10-22 user
+request authorized accelerated implementation across remaining Phases 0–4.
+Validation gates still apply; current work and evidence are tracked in
+`modernization_checklist.md` and `../modernization_summary.md`.
 
 ## Phase 3A — Application and presentation contracts
 
@@ -32,7 +34,8 @@ accumulation screen so the shell can be validated against the established
 Phase 3A and 3B boundaries rather than against placeholders alone.
 
 Status: implemented for the single-window shell and ROI accumulation. Other
-workflow navigation entries are visible but disabled.
+workflow navigation entries were initially visible but disabled; subsequent
+migrations now enable eleven scientific screens (see the modern GUI guide).
 
 ## Phase 3D — First workflow review and hardening
 

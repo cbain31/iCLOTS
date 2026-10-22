@@ -7,7 +7,7 @@ import threading
 from PySide6.QtCore import QObject, Signal, Slot
 
 from iclotspython.application import ROIAccumulationRequest, run_roi_accumulation
-from iclotspython.application.errors import ApplicationError, WorkflowCancelled
+from iclotspython.application.errors import ApplicationError, ErrorCategory, WorkflowCancelled
 
 
 class AnalysisWorker(QObject):
@@ -42,6 +42,12 @@ class AnalysisWorker(QObject):
             self.cancelled.emit(exc)
         except ApplicationError as exc:
             self.failed.emit(exc)
+        except ImportError as exc:
+            self.failed.emit(ApplicationError(
+                category=ErrorCategory.INTERNAL, code="dependency_unavailable",
+                user_message="A required analysis dependency is unavailable. Install this checkout with python -m pip install '.[desktop,analysis]'.",
+                detail=f"{type(exc).__name__}: {exc}",
+            ))
         except Exception as exc:
             self.failed.emit(exc)
         else:
