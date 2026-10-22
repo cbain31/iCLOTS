@@ -97,6 +97,9 @@ class MainWindow(QMainWindow):
             self.workspace.setCurrentWidget(self.roi_screen)
 
     def closeEvent(self, event) -> None:
-        self.roi_screen.shutdown()
+        if not self.roi_screen.shutdown():
+            event.ignore()
+            self.statusBar().showMessage("Cancelling analysis; close again after it stops.")
+            return
         super().closeEvent(event)
 

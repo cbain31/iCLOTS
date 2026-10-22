@@ -154,3 +154,52 @@ def test_overlapping_run_is_rejected_and_cancellation_stops_worker(
         assert not screen.cancel_button.isEnabled()
     finally:
         screen.shutdown()
+
+
+def test_edit_during_worker_discards_stale_result(qt_app, monkeypatch):
+    import threading
+
+    entered, release = threading.Event(), threading.Event()
+    production = workers.run_roi_accumulation
+
+    def delayed(request, progress=None, is_cancelled=None):
+        entered.set()
+        release.wait(2)
+        return production(request, progress, is_cancelled)
+
+    monkeypatch.setattr(workers, "run_roi_accumulation", delayed)
+    screen = ROIAccumulationScreen()
+    try:
+        screen.load_demo()
+        screen.start_analysis()
+        _process_until(qt_app, entered.is_set)
+        screen.calibration_spin.setValue(2)
+        release.set()
+        _process_until(qt_app, lambda: screen._thread is None)
+        assert screen.result is None
+        assert not screen.export_button.isEnabled()
+        assert "Inputs changed" in screen.progress_message.text()
+    finally:
+        release.set()
+        screen.shutdown()
+
+
+def test_shutdown_waits_for_cooperative_worker(qt_app, monkeypatch):
+    import threading
+
+    entered = threading.Event()
+
+    def delayed(request, progress=None, is_cancelled=None):
+        entered.set()
+        while not is_cancelled():
+            time.sleep(0.002)
+        raise WorkflowCancelled()
+
+    monkeypatch.setattr(workers, "run_roi_accumulation", delayed)
+    screen = ROIAccumulationScreen()
+    screen.load_demo()
+    screen.start_analysis()
+    _process_until(qt_app, entered.is_set)
+    assert screen.shutdown()
+    _process_until(qt_app, lambda: screen._thread is None)
+    assert screen.result is None

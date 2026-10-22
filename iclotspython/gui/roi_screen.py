@@ -77,6 +77,8 @@ class ROIAccumulationScreen(QWidget):
         self.result: ROIAccumulationResult | None = None
         self._thread: QThread | None = None
         self._worker: AnalysisWorker | None = None
+        self._revision = 0
+        self._running_revision = None
         self._build_ui()
         self._connect_material_changes()
         self._update_input_state()
@@ -446,6 +448,7 @@ class ROIAccumulationScreen(QWidget):
         )
 
     def _material_changed(self, *args) -> None:
+        self._revision += 1
         if self.result is not None:
             self.invalidate_result(
                 "Parameters changed; previous results were invalidated."
@@ -534,6 +537,8 @@ class ROIAccumulationScreen(QWidget):
         self.run_button.setEnabled(False)
         self.cancel_button.setEnabled(True)
         self.export_button.setEnabled(False)
+        self.invalidate_result("Analysis running…")
+        self._running_revision = self._revision
 
         thread = QThread(self)
         worker = AnalysisWorker(request)
@@ -543,7 +548,7 @@ class ROIAccumulationScreen(QWidget):
         worker.succeeded.connect(self._on_success)
         worker.failed.connect(self._on_failure)
         worker.cancelled.connect(self._on_cancelled)
-        worker.finished.connect(thread.quit)
+        worker.finished.connect(thread.quit, Qt.ConnectionType.DirectConnection)
         worker.finished.connect(worker.deleteLater)
         thread.finished.connect(thread.deleteLater)
         thread.finished.connect(self._on_thread_finished)
@@ -561,6 +566,9 @@ class ROIAccumulationScreen(QWidget):
         self.progress_message.setText(event.message)
 
     def _on_success(self, result: ROIAccumulationResult) -> None:
+        if self._running_revision != self._revision:
+            self.progress_message.setText("Inputs changed; run analysis again")
+            return
         self._apply_result(result)
         self.progress_bar.setValue(100)
         self.progress_message.setText("Analysis complete")
@@ -638,6 +646,7 @@ class ROIAccumulationScreen(QWidget):
         )
 
     def invalidate_result(self, reason: str) -> None:
+        self._revision += 1
         self.result = None
         self.summary_text.setPlainText("No result")
         self.table_model.set_table(roi_table_placeholder())
@@ -772,12 +781,12 @@ class ROIAccumulationScreen(QWidget):
             lines.insert(0, "Export failed.")
         self.export_status.setPlainText("\n".join(lines))
 
-    def shutdown(self) -> None:
+    def shutdown(self) -> bool:
         if self._worker is not None:
             self._worker.request_cancellation()
         if self._thread is not None and self._thread.isRunning():
-            self._thread.quit()
-            self._thread.wait(2000)
+            return self._thread.wait(2000)
+        return True
 
 
 def roi_table_placeholder():
