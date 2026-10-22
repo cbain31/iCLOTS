@@ -7,7 +7,6 @@ cycler==0.12.1
 et_xmlfile==2.0.0
 fonttools==4.67.0
 iclots==2.0.0a1
-iclots==2.0.0a1
 ImageIO==2.38.1
 iniconfig==2.3.1
 joblib==1.6.0

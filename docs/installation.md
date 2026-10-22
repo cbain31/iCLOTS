@@ -7,7 +7,8 @@ It is separate from the original `python iCLOTS.py` Tk launcher and the historic
 ## Source installation
 
 Use Python 3.11 or 3.12. Python 3.12.4 on Windows is the locally validated system;
-the CI matrix also targets Python 3.11 and Ubuntu but has not been run locally.
+the remote CI matrix passed on Windows and Ubuntu with Python 3.11 and 3.12.
+Interactive Linux desktop installation has not been validated locally.
 
 PowerShell, from the checkout:
 

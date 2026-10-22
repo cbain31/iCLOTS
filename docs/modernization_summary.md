@@ -9,6 +9,15 @@ to Git. No pull request has been merged.
 
 ## Delivered implementation
 
+Review is split into stacked draft PRs: [ROI lifecycle #4](https://github.com/cbain31/iCLOTS/pull/4),
+[accumulation #5](https://github.com/cbain31/iCLOTS/pull/5),
+[video workflows #6](https://github.com/cbain31/iCLOTS/pull/6),
+[static adhesion #7](https://github.com/cbain31/iCLOTS/pull/7),
+[clustering #8](https://github.com/cbain31/iCLOTS/pull/8), and
+[packaging/report #9](https://github.com/cbain31/iCLOTS/pull/9).
+The first targets the pre-existing ROI-hardening branch; subsequent PRs target
+the preceding milestone branch. None targets a direct modification of main.
+
 The modern desktop expands from one working screen to eleven: ROI, device and
 microchannel accumulation; velocity profiling; general single-cell tracking,
 deformability and transient adhesion; brightfield and fluorescence static
@@ -39,8 +48,10 @@ fonts; controls and table selection were adjusted after offscreen visual review.
 Packaging now provides `pyproject.toml`, desktop/analysis/test/build extras, a
 tested dependency recipe, source/wheel distributions, lazy `iclots` and
 `python -m iclotspython` entrypoints, and `--check` environment diagnostics.
-CI configuration targets Windows/Ubuntu and Python 3.11/3.12; it is configured,
-not claimed to have run. No package was published.
+CI targets Windows/Ubuntu and Python 3.11/3.12. All four matrix jobs passed tests,
+builds, environment checks and artifact uploads for code commit `8eb634e` in
+[the PR validation run](https://github.com/cbain31/iCLOTS/actions/runs/39804378737).
+No package was published.
 
 ## Executed validation
 
@@ -50,7 +61,7 @@ scikit-image 0.23.2, scikit-learn 1.4.2, matplotlib 3.8.4, openpyxl 3.1.2.
 The first validation used an ignored project virtual environment that reuses
 the existing system scientific libraries. A second, isolated virtual environment
 with `include-system-site-packages=false` then installed the built wheel and
-declared desktop/analysis/test extras successfully. Its 41-package inventory is
+declared desktop/analysis/test extras successfully. Its 40-package inventory is
 recorded in `testing/environments/windows-python312-clean.txt`. Scientific pins
 were retained; the resolver selected matplotlib 3.11.2, openpyxl 3.1.5 and pytest
 9.1.1. All eleven installed screens completed real worker/demo/export checks
@@ -71,6 +82,7 @@ This is a clean Python environment on the same Windows machine, not a fresh OS.
 | Cross-environment numerical probe | 980 numeric cells across velocity, general tracking, static fluorescence and final clustering differed by at most 1.11e-16; no tolerance failures |
 | Final full suite | 305 passed, 17 deselected, with the local-data variable set to confirm opt-in isolation |
 | Missing local data configuration | 17 skipped, 305 deselected |
+| GitHub Actions | Windows and Ubuntu, Python 3.11 and 3.12: all four jobs passed tests, builds, diagnostics and artifact upload on 8eb634e |
 | Combined configured local run | 17 passed, 303 deselected; all source-integrity snapshots unchanged |
 | Visual checks | Two 1280×820 offscreen screenshots inspected; missing-font issue corrected and affected tests rerun |
 
@@ -151,7 +163,7 @@ are retained with warnings. See the [issue register](testing/scientific_issue_re
   Third-party fitting/linking calls limit immediate cancellation responsiveness.
 - A wheel is installable, but no signed Windows installer, macOS application,
   Linux desktop bundle, notarization or auto-update has been produced. Fresh
-  OS-level clean-machine testing, actual CI execution, macOS and interactive
+  OS-level clean-machine desktop testing, macOS and interactive
   accessibility/high-DPI testing remain release gates.
 - Phases 5–6 are proposals only in
   [future_workflows.md](architecture/future_workflows.md). No new scientific or

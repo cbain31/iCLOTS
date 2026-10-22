@@ -181,7 +181,7 @@ installation into the ignored venv, imports outside the checkout, console versio
 and construction of eleven screens passed. Initial checks reused system scientific
 libraries. A subsequent isolated venv installed the wheel and all extras without
 system site packages; all eleven installed screens completed demo/worker/exports,
-and its ordinary suite passed **305 tests, 17 deselected**. The resolved 41-package
+and its ordinary suite passed **305 tests, 17 deselected**. The resolved 40-package
 inventory is committed under `../testing/environments/`. A 980-numeric-cell
 synthetic cross-environment probe had maximum absolute drift 1.11e-16 and zero
 failures at 1e-6 relative / 1e-9 absolute tolerance; unseeded scree was excluded.
@@ -217,4 +217,12 @@ Review stack (all draft, none merged):
 3. Video workflows: https://github.com/cbain31/iCLOTS/pull/6
 4. Static adhesion: https://github.com/cbain31/iCLOTS/pull/7
 5. Clustering: https://github.com/cbain31/iCLOTS/pull/8
-6. Packaging/documentation: created after this milestone commit.
+6. Packaging/documentation: https://github.com/cbain31/iCLOTS/pull/9
+
+All six drafts were pushed and attached to the chat. GitHub Actions for code
+commit `8eb634e` passed all four Windows/Ubuntu, Python 3.11/3.12 matrix jobs,
+including tests, builds, diagnostics and artifact uploads:
+https://github.com/cbain31/iCLOTS/actions/runs/39804378737 . The follow-up commit
+only records review links, the deduplicated environment inventory and CI evidence;
+it introduces no code changes. CI runner notices about deprecated action Node
+runtimes remain upstream maintenance information; no job failed.
