@@ -41,10 +41,11 @@ does not constitute a complete modern workflow.
   Acceptance: independent legacy-reference comparisons cover strict thresholds,
   all-layer geometry, non-finite device percentages, signed changes, calibration,
   raw column occupancy and by-frame aggregation; GUI, CSV/XLSX/PNG tests pass.
-- [ ] Add velocity application and GUI path. Acceptance: preserve destination
+- [x] Add velocity application and GUI path. Acceptance: preserve destination
   detection, swapped/halved KLT windows, status selection, frame/time convention,
   upper-edge bins and sample SD; test real OpenCV orchestration and core parity.
-- [ ] Add the four existing tracking policies. Acceptance: preserve preprocessing,
+- [ ] Add the four existing tracking policies (three enabled; fluorescence blocked
+  by reproduced SCI-001). Acceptance: preserve preprocessing,
   TrackPy batch/link/filter parameters, exclusive particle enumeration and
   endpoint policies; test orchestration and scientific results independently.
 - [ ] Assess remaining static adhesion/filopodia/clustering/utility migration.
@@ -102,3 +103,30 @@ remain future work (explicit crop coordinates work).
 The sandbox's default pytest temporary-directory location is unwritable in some
 runs; an ignored `.pytest_cache` basetemp was used. GitHub CLI authentication is
 invalid, so remote PR creation is not currently available through that CLI.
+
+### M3 — Velocity and video tracking
+
+Added streaming `application/video_input.py`, velocity and tracking services,
+video/track parameter screens, deterministic video demonstration, reference-loop
+tests and local-video GUI tests. Seven modern workflows are now enabled.
+The application services retain OpenCV/TrackPy detection/linking parameters and
+delegate measurements to the existing core. TrackPy 0.7 was installed into an
+ignored `.venv` with access to existing environment dependencies; the global
+environment was not modified. Detection cancellation is checked between frames;
+linking remains one synchronous third-party call.
+
+Executed `.venv/Scripts/python -m pytest -q --basetemp=.pytest_cache/m3-full`:
+**275 passed, 11 deselected**. Two complete 401-frame local velocity videos passed
+GUI and export checks (**2 passed**). Complete representative general,
+deformability and transient videos passed (**3 passed**, 53 seconds). All source
+hashes were unchanged. These use explicit smoke-test parameters, not validated
+biological calibrations or historical-oracle workbooks.
+
+Independent OpenCV-loop events agree within 1e-6 relative tolerance in the same
+library environment; no scientific core formulas changed. Empty detections now
+produce explicit empty results and warnings, replacing legacy GUI crashes.
+Fluorescence mask/intensity division was reproduced as producing NaN/Inf at zero
+pixels; the modern service rejects that case and its navigation remains disabled.
+See `docs/testing/scientific_issue_register.md` (SCI-001). Correction needs
+collaborator methodology review. Labeled video export and historical
+feature-level reproduction remain incomplete. Next: static analysis and packaging.
