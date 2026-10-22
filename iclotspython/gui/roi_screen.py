@@ -71,6 +71,11 @@ class ROIAccumulationScreen(QWidget):
     """End-to-end ROI workflow using Phase 3A and Phase 3B boundaries."""
 
     workflow_title = "ROI Accumulation"
+    requires_same_dimensions = True
+    workflow_description = (
+        "Load an ordered same-field image sequence or use the deterministic "
+        "synthetic demonstration. Calculations use the tested headless core."
+    )
 
     def __init__(self) -> None:
         super().__init__()
@@ -89,10 +94,7 @@ class ROIAccumulationScreen(QWidget):
         layout = QVBoxLayout(self)
         heading = QLabel(self.workflow_title)
         heading.setStyleSheet("font-size: 17px; font-weight: 600;")
-        description = QLabel(
-            "Load an ordered same-field image sequence or use the deterministic "
-            "synthetic demonstration. Calculations use the tested headless core."
-        )
+        description = QLabel(self.workflow_description)
         description.setWordWrap(True)
         layout.addWidget(heading)
         layout.addWidget(description)
@@ -335,9 +337,9 @@ class ROIAccumulationScreen(QWidget):
         if not paths:
             return
         try:
-            incoming = load_image_files(tuple(paths))
+            incoming = load_image_files(tuple(paths), require_same_dimensions=self.requires_same_dimensions)
             if self._loaded is not None:
-                if (incoming.width, incoming.height) != (
+                if self.requires_same_dimensions and (incoming.width, incoming.height) != (
                     self._loaded.width,
                     self._loaded.height,
                 ):
@@ -430,11 +432,12 @@ class ROIAccumulationScreen(QWidget):
         if self._loaded is None or row < 0 or row >= len(self._loaded.frames_rgb):
             return
         frame = self._loaded.frames_rgb[row]
+        height, width = frame.shape[:2]
         image = QImage(
             frame.data,
-            self._loaded.width,
-            self._loaded.height,
-            self._loaded.width * 3,
+            width,
+            height,
+            width * 3,
             QImage.Format.Format_RGB888,
         ).copy()
         pixmap = QPixmap.fromImage(image).scaled(
@@ -446,7 +449,7 @@ class ROIAccumulationScreen(QWidget):
         self.preview_label.setPixmap(pixmap)
         self.preview_details.setText(
             f"{self._loaded.labels[row]} • "
-            f"{self._loaded.width}×{self._loaded.height} pixels"
+            f"{width}×{height} pixels"
         )
 
     def _material_changed(self, *args) -> None:

@@ -18,6 +18,7 @@ from .roi_screen import ROIAccumulationScreen
 from .workflow_screen import MultiscaleScreen
 from .video_screen import VelocityScreen
 from .tracking_screen import TrackingScreen
+from .adhesion_screen import AdhesionScreen
 
 
 class MainWindow(QMainWindow):
@@ -66,6 +67,10 @@ class MainWindow(QMainWindow):
             screen = TrackingScreen(policy)
             self.screens[screen.workflow_title] = screen
             self.workspace.addWidget(screen)
+        for mode in ("brightfield", "fluorescence", "filopodia"):
+            screen = AdhesionScreen(mode)
+            self.screens[screen.workflow_title] = screen
+            self.workspace.addWidget(screen)
         horizontal_layout.addWidget(self.workspace, 1)
         body_layout.addWidget(horizontal)
         layout.addWidget(body, 1)
@@ -90,7 +95,7 @@ class MainWindow(QMainWindow):
             ],
             "Velocity": [("Velocity Profiling", True)],
             "Cell tracking": [("Single-cell Tracking", True), ("Deformability", True), ("Fluorescence Tracking — scientific review pending", False)],
-            "Adhesion": [("Transient Adhesion", True), ("Adhesion Analysis — coming later", False)],
+            "Adhesion": [("Transient Adhesion", True), ("Brightfield Adhesion", True), ("Fluorescence Adhesion", True), ("Filopodia", True)],
             "Machine learning": [("Clustering — coming later", False)],
             "Utilities": [("Utilities — coming later", False)],
         }

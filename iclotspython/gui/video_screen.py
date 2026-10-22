@@ -16,6 +16,7 @@ from .workflow_screen import WorkflowScreen
 
 class VelocityScreen(WorkflowScreen):
     workflow_title = "Velocity Profiling"
+    workflow_description = "Choose one video or a clearly labeled synthetic demonstration. Set the scientific acquisition rate explicitly; decoding and analysis run in a background worker."
     service = staticmethod(run_velocity)
 
     def __init__(self):
