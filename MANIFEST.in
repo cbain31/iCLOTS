@@ -1,0 +1,11 @@
+include README.md LICENSE pyproject.toml
+include requirements-*.txt
+recursive-include docs *.md *.txt
+recursive-include iclotspython *.py
+prune tests
+prune data
+prune audit_outputs
+prune iCLOTS_softwareonly
+prune .venv
+prune .pytest_cache
+global-exclude __pycache__ *.py[cod]

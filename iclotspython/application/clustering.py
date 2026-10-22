@@ -112,7 +112,7 @@ def run_clustering(request: ClusteringRequest, progress=None, is_cancelled=None)
         correlation = np.corrcoef(values, rowvar=False)
     tables.append(NamedTable("Feature correlation", TableData(("Feature", *request.features), tuple((name, *map(float, row)) for name, row in zip(request.features, correlation)))))
     plots = (PlotPanel("Scree diagnostic (unseeded legacy)", "Number of clusters", "SSE", (PlotSeries("SSE", "", "SSE", tuple(float(k) for k, _ in result.scree), tuple(v for _, v in result.scree), "clusters", "SSE"),)),
-             PlotPanel("Selected feature groups", request.features[0], request.features[1], tuple(PlotSeries(f"Cluster {label}", "", "features", tuple(map(float, values[labels == label, 0])), tuple(map(float, values[labels == label, 1])), "input units", "input units") for label in sorted(set(result.labels)))))
+             PlotPanel("Selected feature groups", request.features[0], request.features[1], tuple(PlotSeries(f"Cluster {label}", "", "features", tuple(map(float, values[labels == label, 0])), tuple(map(float, values[labels == label, 1])), "input units", "input units") for label in sorted(set(result.labels))), kind="scatter"))
     warnings = ("Features use original units without scaling; rows missing any selected feature are excluded and listed explicitly.",
                 "Final KMeans retains random_state=100. Other estimator defaults depend on scikit-learn and are recorded; exact historical default parity is unestablished.",
                 "Legacy scree diagnostic is unseeded and may vary across runs. It uses up to 11 clusters, bounded by available rows; final clustering is separately seeded.")

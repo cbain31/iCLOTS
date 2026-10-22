@@ -50,7 +50,10 @@ def create_workflow_figure(result):
     for index, panel in enumerate(result.plots):
         axis = figure.add_subplot((count + 1) // 2, min(count, 2), index + 1)
         for series in panel.series:
-            axis.plot(series.x, series.y, marker="o", markersize=3, label=series.name)
+            if panel.kind == "scatter":
+                axis.scatter(series.x, series.y, s=12, label=series.name)
+            else:
+                axis.plot(series.x, series.y, marker="o", markersize=3, label=series.name)
         axis.set(title=panel.title, xlabel=panel.x_label, ylabel=panel.y_label)
         if panel.series:
             axis.legend()

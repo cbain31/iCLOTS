@@ -23,6 +23,17 @@ threshold/mass policies and compare tracked cells, area and fluorescence against
 annotated representative data. This would be a named new policy, preserving
 the legacy reference. No corrected policy has been implemented.
 
+## SCI-002 — Legacy image normalization indexes a row
+
+`videoedit/normalize_folderapp.py` loops `for i in range(l)` but writes `img[l]`
+each iteration. For an RGB image `l` is three, so this repeatedly modifies the
+fourth row, rather than each color plane, and can also divide by zero for a
+constant image. The utility is retained in the legacy tree; no corrected
+normalization is introduced into the modern application. Collaborators must
+agree whether normalization is per-image or per-channel, how to handle constant
+images and bit depth, and how resulting intensity changes affect downstream
+thresholds before a corrected preprocessing policy is enabled.
+
 ## Existing documented conventions
 
 - Track enumeration excludes the last filtered particle ID and uses unfiltered

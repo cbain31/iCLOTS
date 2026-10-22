@@ -1,5 +1,11 @@
 # Phase 2 core separation
 
+Historical Phase 2 record. The accelerated modernization subsequently adds lazy
+static-adhesion and clustering core modules, application services for multiscale,
+velocity, tracking, static adhesion and clustering, and eleven modern GUI screens.
+Heavy scientific dependencies load only when those new computations execute.
+See `modernization_checklist.md` for current scope and executed evidence.
+
 ## Purpose and boundary
 
 Phase 2 establishes one importable, headless production calculation package at

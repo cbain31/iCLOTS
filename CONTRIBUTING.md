@@ -27,6 +27,15 @@ We would be happy to work new functionalities into iCLOTS! Please contact the de
 
 ## Development Environment
 
+For the modern application, use Python 3.11–3.12 and install
+`python -m pip install -e ".[desktop,analysis,test]"`. Run `python -m pytest -q`
+with `QT_QPA_PLATFORM=offscreen` and, on Windows/MKL, `OMP_NUM_THREADS=1`.
+See [installation](docs/installation.md) and the
+[implementation checklist](docs/architecture/modernization_checklist.md).
+Keep scientific changes separate from interface changes; new methods need an
+independent reference, explicit units/exclusions and collaborator-approved
+validation. Never add source datasets or patient identifiers to Git.
+
 iCLOTS has been developed using [PyCharm](https://www.jetbrains.com/pycharm/). The Community Edition is free and contains all the features needed for easy development.
 
 ## Style Guide

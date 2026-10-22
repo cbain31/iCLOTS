@@ -104,7 +104,9 @@ def test_provenance_contains_reproducibility_fields_and_warning_codes():
     provenance = result.provenance
     assert provenance.workflow_name == "roi_accumulation"
     assert provenance.workflow_contract_version == "1.0"
-    assert provenance.application_version == "unversioned"
+    from iclotspython import __version__
+
+    assert provenance.application_version == __version__
     assert provenance.scientific_core_module == "iclotspython.core.accumulation"
     assert provenance.selected_channels == ("red",)
     assert provenance.thresholds == (("red", 50.0),)

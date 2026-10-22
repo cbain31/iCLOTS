@@ -1,5 +1,12 @@
 # Optional local iCLOTS test-data inventory
 
+This inventory records the earlier ROI-only migration state. The file counts,
+dimensions and provenance uncertainties remain relevant. Modern support has
+subsequently expanded to all accumulation modes, velocity, general/deformability/
+transient tracking, all three static adhesion modes and clustering. Current
+execution evidence and limitations are in `../modernization_summary.md`;
+fluorescence video tracking and utilities remain incomplete.
+
 ## Scope and handling policy
 
 This inventory describes the original locally distributed dataset expected at

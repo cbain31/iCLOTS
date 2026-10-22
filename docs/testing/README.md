@@ -1,5 +1,23 @@
 # Phase 1 test foundation
 
+## Accelerated modernization coverage
+
+The suite now exercises every enabled modern screen: three accumulation modes,
+velocity, three tracking policies, three static adhesion modes and clustering.
+New service tests compare OpenCV orchestration, TrackPy settings, independent
+static-cell references and final KMeans behavior. Export tests verify multi-table
+CSV/XLSX/PNG, reproducibility JSON, checksums, overwrite refusal, partial failures
+and preservation of existing files on failed replacement. Launcher tests protect
+lazy imports and dependency recipes. See `../modernization_summary.md` for exact
+executed commands, counts and remaining limitations.
+
+Install `.[desktop,analysis,test]` for the complete suite. TrackPy-specific tests
+skip when that optional dependency is absent; such a run is not full workflow
+validation. The earlier ROI/core-only setup below describes the original test
+foundation. Local integration now covers complete multiscale image groups,
+velocity and representative tracking videos, static adhesion and clustering
+workbooks. The explicit opt-in hook and markers are unchanged.
+
 ## Phase 2 production-core coverage
 
 Phase 2 adds direct tests in `test_accumulation_core.py`,

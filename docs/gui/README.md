@@ -1,145 +1,90 @@
-# Modern PySide6 interface
+# Modern desktop workflow guide
 
-Phase 3C provides one restrained desktop shell and one functional ROI
-accumulation workflow. It is a client of the Phase 3A application contracts
-and Phase 3B output services; it is not a new scientific implementation.
+The 2.0.0a1 compatibility preview has eleven enabled scientific screens in one
+PySide6 window. Install with `python -m pip install ".[desktop,analysis]"` and
+launch `python -m iclotspython` or `iclots`. The original Tk launcher remains
+available from the checkout. See [installation](../installation.md).
 
-## Install and launch
+## Workflows and inputs
 
-From the repository root, install the normal test dependencies and the
-optional modern-desktop dependencies:
+| Screen | Inputs and parameters | Results |
+|---|---|---|
+| ROI Accumulation | Ordered equal-size images; explicit RGB/BGR, channel thresholds, calibration and interval | Artificial zero baseline, area, signed frame changes |
+| Device Accumulation | Same-field images, channels, thresholds, calibration, optional explicit crop | Signal-derived device map count, area, unrestricted device percentage and signed changes |
+| Microchannel Accumulation | Same-field images; all three thresholds define final-frame geometry | Geometry bands, individual channel measurements, raw per-column occupancy and frame means |
+| Velocity Profiling | One video, acquisition FPS, calibration, bins, corners, block/window sizes, optional crop | Every accepted event, frame summaries, upper-edge profile with sample SD and descriptive statistics |
+| Single-cell Tracking | One video, diameter, mass, search/distance criteria, FPS, calibration | Legacy-selected track measurements, linked details and statistics |
+| Deformability | One video; width-derived search and strict distance bounds | Signed endpoint measurements under the existing deformability policy |
+| Transient Adhesion | One video; mass interval, width-derived search, FPS and calibration | Existing signed transient measurements, including reverse motion |
+| Brightfield Adhesion | Independent images, odd diameter, mass, invert and calibration | TrackPy detections, radius-based area, eccentricity and density |
+| Fluorescence Adhesion | Independent images; primary/functional channels, strict thresholds/size bounds | Areas, eccentricity, texture, conditional functional intensity and density |
+| Filopodia | Independent images; threshold/size bounds, Harris settings, channel and calibration | Legacy convex-image corner count and distance summaries |
+| Clustering | One-sheet XLSX workbooks, two or more selected numeric features, cluster count | Seeded final labels, explicit missing-row exclusions, cluster statistics/counts, correlation and unseeded scree diagnostic |
 
-```powershell
-python -m pip install -r requirements-test.txt
-python -m pip install -r requirements-gui.txt
-python -m iclotspython.gui
-```
+Fluorescence **video tracking** is disabled pending scientific review of a
+reproduced division-by-zero defect. Static fluorescence adhesion is available.
+Video editing utilities remain in the original application.
 
-`requirements-gui.txt` is development dependency metadata, not Phase 4
-packaging. PySide6 6.9 is pinned because 6.11.1 failed to load its native
-QtCore DLL in the validated Windows 11 / Anaconda Python 3.12 environment.
+## Input handling
 
-## Shell and navigation
+Image selection preserves the supplied file order. Accumulation requires equal
+sizes; static adhesion accepts differently sized independent specimens. Preview
+the selected image and verify its filename and dimensions before analysis.
+Remove or clear inputs to correct selection; reload in the intended order when
+reordering is needed. Qt reads the first TIFF page and converts images to uint8
+RGB; it does not currently expose multipage/high-bit-depth selection. Do not
+infer file-level parity for such images without an explicit decoding comparison.
 
-The application has one main window, a grouped workflow tree, a central
-workspace, and a status bar. ROI Accumulation is enabled. Device and
-microchannel accumulation, velocity, tracking, adhesion, clustering, and
-utilities remain visible but disabled so the incremental migration path is
-clear without presenting nonfunctional screens.
+Optional crop controls use integer x/y/width/height in source pixels. Unchecked
+means the full image/video; checked rectangles must be nonempty and inside every
+input. Coordinates in results are crop-relative. Visual ROI drawing and mask
+previews remain future work.
 
-No `QApplication` or window is constructed at import time. The canonical
-entrypoint creates one application instance and one main window.
+Videos show a first-frame preview and decode in the analysis worker. Acquisition
+FPS defaults to the legacy value 1 and must be set from the experiment. Playback
+FPS is not a substitute for the scientific acquisition rate. Tracking retains
+processed grayscale/mask frames in memory; large recordings require substantial
+memory. The synthetic demos are labeled artificial inputs, not specimen data.
 
-## ROI accumulation workflow
+## Execution and outputs
 
-The screen supports:
+Run one analysis per screen, watch progress, or request cooperative cancellation.
+Changing inputs or parameters invalidates old results; edits during a run discard
+that run's stale result. Cancellation is checked between decode/detection steps;
+third-party linking/fitting must return before it can complete. Window close is
+deferred when a worker has not stopped safely. There is no application-wide queue.
 
-1. selecting multiple PNG, JPEG, BMP, TIFF images in explicit analysis order;
-2. removing or clearing inputs and previewing the selected image;
-3. loading a deterministic, clearly labeled synthetic demonstration;
-4. selecting an explicit RGB or BGR convention;
-5. selecting red, green, and blue channels independently;
-6. setting strict per-channel thresholds, calibration, and frame interval;
-7. running one background analysis, viewing progress, and requesting
-   cooperative cancellation;
-8. inspecting summary, immutable table data, plot-ready series, warnings, and
-   provenance;
-9. exporting selected PNG, CSV, and XLSX outputs through Phase 3B.
+Use Summary, Data table, Plot, Warnings & provenance and Export tabs. For migrated
+workflows the table selector above the tabs chooses raw, summary or diagnostic
+tables. ROI retains its established single-table presentation.
 
-Loaded files must have equal dimensions. Qt normalizes supported images into
-read-only RGB arrays. The screen converts them to the explicitly selected
-convention before constructing `ROIAccumulationRequest`. It never passes file
-paths as scientific inputs.
+Choose an existing output directory and desired CSV, XLSX or PNG formats. New
+workflow exports include a JSON reproducibility report with exact parameters,
+source identifiers, scientific policy, versions, warnings and table schemas.
+CSV writes each result table separately; XLSX contains those tables plus a
+Reproducibility sheet. NaN/Inf remain explicit text in file outputs. Manifests
+report per-file status, checksums, partial failures and errors. Existing files
+require explicit replacement approval; failed replacements preserve originals.
+ROI continues to use its established PNG/CSV/XLSX output contract.
 
-The synthetic demonstration contains three 64 × 48 RGB frames with a red
-rectangle that grows and then shrinks. It exercises both positive and negative
-signed accumulation and writes no files unless the user explicitly exports.
-It is synthetic UI test data, not biological or research data.
+The application does not yet export labeled images/videos, exhaustive clustering
+pairplots/mosaics, saved sessions or batch projects. Legacy calculation adapters
+and the historical software-only snapshot remain intact.
 
-## Threading and cancellation
+## Review and testing
 
-`run_roi_accumulation` remains synchronous and GUI-independent. A small Qt
-worker calls it on a `QThread`, forwards the existing `ProgressEvent` objects,
-and exposes a thread-safe cancellation flag through the existing application
-protocol. The screen disables overlapping runs. Cancellation is cooperative;
-it does not terminate a thread or discard filesystem output midway.
-
-## Results and exports
-
-The result table binds to Phase 3A `TableData`. The embedded figure consumes
-Phase 3A `PlotSeries`; it does not reuse a legacy plotting function. Export
-buttons remain disabled until a current result exists.
-
-The GUI constructs Phase 3B `PlotRequest` and `ExportRequest` objects. It
-shows their `OutputManifest` records, including partial and failed outcomes.
-No file is silently overwritten: the default is fail-if-present, and explicit
-replacement requires user confirmation. Only selected output formats are
-requested.
-
-Changing input order, channel convention, channel selection, thresholds,
-calibration, or timing invalidates the previous result and disables export.
-
-## Testing
-
-Run the GUI-specific headless suite:
+Load a synthetic demo, run, inspect tables/plots/provenance, export to an empty
+folder, then change a parameter and verify that export is disabled until rerun.
+Headless tests exercise these paths on every enabled screen:
 
 ```powershell
 $env:QT_QPA_PLATFORM = "offscreen"
+$env:OMP_NUM_THREADS = "1"
 python -m pytest -m gui
 ```
 
-These tests need no raw microscopy data and create output only inside
-automatically cleaned repository-local test directories.
-
-An optional ignored local dataset can exercise the same screen without
-becoming part of ordinary testing:
-
-```powershell
-$env:ICLOTS_TEST_DATA_DIR = "<local path>"
-$env:QT_QPA_PLATFORM = "offscreen"
-python -m pytest -m local_data
-```
-
-The selected local smoke sequence and its limitations are documented in
-[`../testing/local_test_data_inventory.md`](../testing/local_test_data_inventory.md).
-It establishes file-loading and workflow operability, not legacy parity.
-
-## Visual review steps
-
-1. Launch with `python -m iclotspython.gui`.
-2. Select **ROI Accumulation** in the left navigation.
-3. Click **Load synthetic demo**, then **Run analysis**.
-4. Inspect the **Summary**, **Data table**, **Plot**, and
-   **Warnings & provenance** tabs. The plot should show the red ROI growing
-   and then shrinking.
-5. Open **Export**, choose an empty destination directory, select the desired
-   PNG/CSV/XLSX formats, and export. Review the returned manifest and the
-   created files.
-6. To review real-image handling, clear the inputs, click **Add images…**,
-   select a same-size sequence in the desired order, confirm the displayed
-   order, choose the explicit convention/channels/thresholds/calibration, and
-   run.
-7. Report the operating system, display scaling, input dimensions, exact
-   action, and visible message with UI feedback. Do not include sensitive
-   research data or personal information.
-
-## Troubleshooting
-
-- If Qt reports that no platform plugin can be initialized in a headless
-  environment, set `$env:QT_QPA_PLATFORM = "offscreen"` before testing. Do
-  not use offscreen mode for ordinary visual review.
-- If `QtCore` reports a native DLL load failure, confirm that
-  `python -m pip show PySide6` reports the tested 6.9 line and reinstall from
-  `requirements-gui.txt`.
-- If an image cannot be loaded, convert it to PNG, JPEG, BMP, or TIFF and
-  confirm every frame has identical pixel dimensions.
-- If export reports an existing target, choose a different directory or
-  explicitly approve replacement. The application never silently overwrites.
-
-## Current limitations
-
-Phase 3C does not provide threshold-mask preview, drag-and-drop reordering,
-project/session save and restore, batch analysis, application-wide job
-management, accessibility review, installer integration, or migrated
-workflows beyond ROI accumulation. Those are candidates for later approved
-phases. The legacy Tkinter application and its behavior remain unchanged.
+Local examples remain opt-in through `ICLOTS_TEST_DATA_DIR` and `-m local_data`.
+They establish operability and unchanged source hashes, not validated biological
+parameters or exact historical parity. Review the
+[validation summary](../modernization_summary.md) and
+[scientific issue register](../testing/scientific_issue_register.md).

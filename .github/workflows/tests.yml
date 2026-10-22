@@ -1,0 +1,38 @@
+name: Modern application tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        python: ['3.11', '3.12']
+    runs-on: ${{ matrix.os }}
+    env:
+      QT_QPA_PLATFORM: offscreen
+      MPLBACKEND: Agg
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install Qt system libraries (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libegl1 libopengl0 libgl1
+      - run: python -m pip install ".[desktop,analysis,test,build]"
+      - run: python -m pytest -q
+      - run: python -m build
+      - run: python -m iclotspython --check
+      - uses: actions/upload-artifact@v4
+        with:
+          name: distributions-${{ matrix.os }}-${{ matrix.python }}
+          path: dist/*
