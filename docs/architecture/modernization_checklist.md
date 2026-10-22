@@ -151,3 +151,22 @@ screens are enabled. Colored-image grayscale decoding may differ from legacy
 codec-specific imread behavior, and TIFF page selection remains first-page only;
 image-file-level historical parity is not asserted. Labeled images remain to
 be migrated. Next: clustering, packaging and final validation.
+
+### M5 — Clustering
+
+Added a lazy core KMeans adapter, single-sheet workbook loader, explicit feature
+selection, seeded final clustering, original unscaled/dropna policy, exclusion
+audit, cluster statistics/counts, correlation and scree data and standard exports.
+Estimator defaults are recorded rather than guessed from historical versions.
+The unseeded legacy scree remains labeled nondeterministic. For fewer than 11
+rows its range stops at the available row count instead of crashing. No final
+cluster method, feature normalization or row exclusion definition was changed.
+
+Targeted unit/GUI tests: **9 passed**. Local artificial and Control/SCD workbook
+groups plus rejection of the distributed multisheet error workbook: **3 passed**;
+source snapshots unchanged. Tests compare final labels/silhouette directly to
+the checked-in KMeans constructor in scikit-learn 1.4.2. Local commands set
+`OMP_NUM_THREADS=1` to avoid scikit-learn's Windows/MKL thread-count warning;
+this is an execution setting, not an application parameter default. The modern
+screen plots the first selected feature pair and exports correlations; exhaustive
+pairplots and mosaic images remain unmigrated. Eleven scientific screens enabled.
