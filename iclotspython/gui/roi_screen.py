@@ -70,6 +70,8 @@ from .workers import AnalysisWorker
 class ROIAccumulationScreen(QWidget):
     """End-to-end ROI workflow using Phase 3A and Phase 3B boundaries."""
 
+    workflow_title = "ROI Accumulation"
+
     def __init__(self) -> None:
         super().__init__()
         self.setObjectName("roi_accumulation_screen")
@@ -85,7 +87,7 @@ class ROIAccumulationScreen(QWidget):
 
     def _build_ui(self) -> None:
         layout = QVBoxLayout(self)
-        heading = QLabel("ROI Accumulation")
+        heading = QLabel(self.workflow_title)
         heading.setStyleSheet("font-size: 17px; font-weight: 600;")
         description = QLabel(
             "Load an ordered same-field image sequence or use the deterministic "
@@ -541,7 +543,7 @@ class ROIAccumulationScreen(QWidget):
         self._running_revision = self._revision
 
         thread = QThread(self)
-        worker = AnalysisWorker(request)
+        worker = self.create_worker(request)
         worker.moveToThread(thread)
         thread.started.connect(worker.run)
         worker.progress.connect(self._on_progress)
@@ -555,6 +557,9 @@ class ROIAccumulationScreen(QWidget):
         self._thread = thread
         self._worker = worker
         thread.start()
+
+    def create_worker(self, request):
+        return AnalysisWorker(request)
 
     def cancel_analysis(self) -> None:
         if self._worker is not None:

@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 
 from . import GUI_VERSION
 from .roi_screen import ROIAccumulationScreen
+from .workflow_screen import MultiscaleScreen
 
 
 class MainWindow(QMainWindow):
@@ -51,6 +52,11 @@ class MainWindow(QMainWindow):
         self.workspace.setObjectName("workflow_workspace")
         self.roi_screen = ROIAccumulationScreen()
         self.workspace.addWidget(self.roi_screen)
+        self.screens = {"ROI Accumulation": self.roi_screen}
+        for mode in ("device", "microchannel"):
+            screen = MultiscaleScreen(mode)
+            self.screens[screen.workflow_title] = screen
+            self.workspace.addWidget(screen)
         horizontal_layout.addWidget(self.workspace, 1)
         body_layout.addWidget(horizontal)
         layout.addWidget(body, 1)
@@ -63,15 +69,15 @@ class MainWindow(QMainWindow):
 
         self.statusBar().setObjectName("application_status_bar")
         self.statusBar().showMessage(
-            "ROI Accumulation is the available modern workflow."
+            "Choose a workflow; parameters and results are independent for each screen."
         )
 
     def _build_navigation(self) -> None:
         groups = {
             "Accumulation and occlusion": [
                 ("ROI Accumulation", True),
-                ("Device Accumulation — coming later", False),
-                ("Microchannel Accumulation — coming later", False),
+                ("Device Accumulation", True),
+                ("Microchannel Accumulation", True),
             ],
             "Velocity": [("Velocity Profiling — coming later", False)],
             "Cell tracking": [("Single-cell Tracking — coming later", False)],
@@ -93,11 +99,14 @@ class MainWindow(QMainWindow):
 
     def _navigation_changed(self) -> None:
         selected = self.navigation.selectedItems()
-        if selected and selected[0].data(0, Qt.ItemDataRole.UserRole) == "ROI Accumulation":
-            self.workspace.setCurrentWidget(self.roi_screen)
+        if selected:
+            name = selected[0].data(0, Qt.ItemDataRole.UserRole)
+            if name in self.screens:
+                self.workspace.setCurrentWidget(self.screens[name])
 
     def closeEvent(self, event) -> None:
-        if not self.roi_screen.shutdown():
+        stopped = [screen.shutdown() for screen in self.screens.values()]
+        if not all(stopped):
             event.ignore()
             self.statusBar().showMessage("Cancelling analysis; close again after it stops.")
             return

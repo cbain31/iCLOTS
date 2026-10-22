@@ -37,7 +37,7 @@ does not constitute a complete modern workflow.
 - [x] Harden ROI worker state and shutdown. Acceptance: parameter/input changes
   cannot publish stale results; closing a running window cannot destroy a live
   QThread; exercised cancellation/failure tests pass.
-- [ ] Add device and microchannel application/presentation/output/GUI paths.
+- [x] Add device and microchannel application/presentation/output/GUI paths.
   Acceptance: independent legacy-reference comparisons cover strict thresholds,
   all-layer geometry, non-finite device percentages, signed changes, calibration,
   raw column occupancy and by-frame aggregation; GUI, CSV/XLSX/PNG tests pass.
@@ -78,3 +78,27 @@ shutdown can finish while the GUI thread waits. Window close is deferred if a
 worker does not stop within two seconds. Files: ROI screen, main window, GUI
 workflow tests. Executed `python -m pytest tests/gui/test_gui_roi_workflow.py -q`:
 **7 passed**. No scientific calculations changed. Next: accumulation migration.
+
+### M2 — Multiscale accumulation
+
+Added `application/common.py`, `application/multiscale.py`, immutable multi-table
+presentation contracts, shared workflow output services and Qt screens. Device
+and microchannel navigation is enabled. Explicit crop rectangles, all-color
+geometry thresholds, raw column occupancy, frame means, geometry rows, plots,
+CSV/XLSX and JSON reproducibility reports are supported. Writers preserve
+existing files by default and use temporary sibling files for replacement.
+
+Executed `python -m pytest -q --basetemp=.pytest_cache/m2-full`:
+**252 passed, 6 deselected**. Executed with `ICLOTS_TEST_DATA_DIR` explicitly set,
+`python -m pytest -q -m local_data --basetemp=.pytest_cache/m2-local`:
+**6 passed, 252 deselected**, including both complete nine-frame subgroups and
+both multiscale screens. Source name/size/SHA-256 snapshots were unchanged.
+Openpyxl 3.1.2 emits upstream UTC deprecation warnings. No numerical core changes;
+independent-reference comparisons preserve baseline, geometry, signed changes,
+calibration and non-finite percentages. Local examples establish operability,
+not historical parity. Labeled-image exports and interactive visual ROI drawing
+remain future work (explicit crop coordinates work).
+
+The sandbox's default pytest temporary-directory location is unwritable in some
+runs; an ignored `.pytest_cache` basetemp was used. GitHub CLI authentication is
+invalid, so remote PR creation is not currently available through that CLI.

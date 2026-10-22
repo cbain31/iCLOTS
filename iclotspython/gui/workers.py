@@ -19,10 +19,11 @@ class AnalysisWorker(QObject):
     cancelled = Signal(object)
     finished = Signal()
 
-    def __init__(self, request: ROIAccumulationRequest) -> None:
+    def __init__(self, request, service=None) -> None:
         super().__init__()
         self._request = request
         self._cancelled = threading.Event()
+        self._service = service
 
     def request_cancellation(self) -> None:
         """Thread-safe cancellation flag used by the application contract."""
@@ -32,7 +33,7 @@ class AnalysisWorker(QObject):
     def run(self) -> None:
         """Call Phase 3A and translate its structured outcomes to Qt signals."""
         try:
-            result = run_roi_accumulation(
+            result = (self._service or run_roi_accumulation)(
                 self._request,
                 progress=self.progress.emit,
                 is_cancelled=self._cancelled.is_set,
