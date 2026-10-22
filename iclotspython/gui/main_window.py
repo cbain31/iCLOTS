@@ -16,6 +16,8 @@ from PySide6.QtWidgets import (
 from . import GUI_VERSION
 from .roi_screen import ROIAccumulationScreen
 from .workflow_screen import MultiscaleScreen
+from .video_screen import VelocityScreen
+from .tracking_screen import TrackingScreen
 
 
 class MainWindow(QMainWindow):
@@ -57,6 +59,13 @@ class MainWindow(QMainWindow):
             screen = MultiscaleScreen(mode)
             self.screens[screen.workflow_title] = screen
             self.workspace.addWidget(screen)
+        velocity = VelocityScreen()
+        self.screens[velocity.workflow_title] = velocity
+        self.workspace.addWidget(velocity)
+        for policy in ("general", "deformability", "transient_adhesion"):
+            screen = TrackingScreen(policy)
+            self.screens[screen.workflow_title] = screen
+            self.workspace.addWidget(screen)
         horizontal_layout.addWidget(self.workspace, 1)
         body_layout.addWidget(horizontal)
         layout.addWidget(body, 1)
@@ -79,9 +88,9 @@ class MainWindow(QMainWindow):
                 ("Device Accumulation", True),
                 ("Microchannel Accumulation", True),
             ],
-            "Velocity": [("Velocity Profiling — coming later", False)],
-            "Cell tracking": [("Single-cell Tracking — coming later", False)],
-            "Adhesion": [("Adhesion Analysis — coming later", False)],
+            "Velocity": [("Velocity Profiling", True)],
+            "Cell tracking": [("Single-cell Tracking", True), ("Deformability", True), ("Fluorescence Tracking — scientific review pending", False)],
+            "Adhesion": [("Transient Adhesion", True), ("Adhesion Analysis — coming later", False)],
             "Machine learning": [("Clustering — coming later", False)],
             "Utilities": [("Utilities — coming later", False)],
         }
