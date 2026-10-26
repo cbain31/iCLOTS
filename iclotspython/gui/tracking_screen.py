@@ -27,6 +27,15 @@ class TrackingScreen(VelocityScreen):
                 ("maxmass", "Maximum mass, transient (a.u.)", 2500), ("search_range", "Search range (pixels)", 60),
                 ("minimum_distance", "Distance threshold (pixels)", 100))
 
+    @property
+    def demo_source_identifier(self):
+        return f"synthetic://tracking/{self.policy}"
+
+    def demo_frames(self):
+        from .video_demo import tracking_video_demo
+
+        return tracking_video_demo(self.policy)
+
     def build_request(self):
         return TrackingRequest(self.video_input(), self.policy, self.calibration_spin.value(), self.fps_spin.value(),
             **{name: spin.value() for name, spin in self.video_parameters.items()}, roi=self.region())

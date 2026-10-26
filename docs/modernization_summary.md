@@ -171,6 +171,33 @@ are retained with warnings. See the [issue register](testing/scientific_issue_re
 
 ## Publication planning
 
+### Follow-up: default tracking demos (2026-10-26)
+
+A user-exported synthetic general-tracking report contained 33 linked detections
+but zero accepted measurements. The shared 12-frame demo did not travel far
+enough for the default general/deformability distance cutoffs; its bright spots
+also exceeded transient adhesion's default maximum mass. Earlier smoke tests
+changed parameters and checked linked rows rather than requiring accepted tracks.
+Their passing status did not demonstrate a working demo under untouched defaults.
+
+Tracking now uses separate deterministic 32-frame data with cells remaining in
+view, plus compact transient spots inside its default mass interval. Loading a
+video demo restores existing defaults and disables the previous crop. Velocity's
+original synthetic frames and all scientific defaults/calculations are unchanged.
+Reports retain the actual synthetic source identifier and describe only the
+preprocessing used by the chosen policy.
+
+The actual demo/run buttons are regression-tested under unchanged defaults for
+all three enabled tracking policies, requiring accepted measurements, nonempty
+plots and matching CSV/JSON exports. Reload tests cover stale crops and invalid
+previous parameters. Full suite: **308 passed, 17 deselected**. Seven targeted
+video GUI tests also passed in the clean environment. The corrected general demo
+has two accepted tracks at approximately 2.033 µm/s with default calibration/FPS;
+the known source motion is 2 pixels/frame and the legacy foreground masks shift
+endpoint centroids by one pixel. Tests allow that explicit localization tolerance.
+Original user export files were hash-checked and remained unchanged; corrected
+synthetic exports were written into a separate ignored output directory.
+
 The evidence supports describing an expanded interface, explicit scientific
 compatibility contracts, independent numerical references, opt-in read-only
 dataset integration, reproducibility metadata and practical Python packaging.

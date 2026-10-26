@@ -45,6 +45,12 @@ FPS defaults to the legacy value 1 and must be set from the experiment. Playback
 FPS is not a substitute for the scientific acquisition rate. Tracking retains
 processed grayscale/mask frames in memory; large recordings require substantial
 memory. The synthetic demos are labeled artificial inputs, not specimen data.
+Loading a video demo restores the workflow's existing default parameters and
+disables any previous crop. Tracking demos use 32 frames with enough displacement
+to satisfy the default general/deformability bounds; transient adhesion uses
+compact spots within its default mass interval. They produce accepted measurements
+without lowering scientific thresholds. Reopen the application after updating
+the source so a running Python process loads the corrected demo.
 
 ## Execution and outputs
 

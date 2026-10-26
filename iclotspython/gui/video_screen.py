@@ -18,6 +18,7 @@ class VelocityScreen(WorkflowScreen):
     workflow_title = "Velocity Profiling"
     workflow_description = "Choose one video or a clearly labeled synthetic demonstration. Set the scientific acquisition rate explicitly; decoding and analysis run in a background worker."
     service = staticmethod(run_velocity)
+    demo_source_identifier = "synthetic://moving-particles"
 
     def __init__(self):
         self.video_path = None
@@ -78,19 +79,31 @@ class VelocityScreen(WorkflowScreen):
     def video_input(self):
         if self._loaded is None:
             raise RequestValidationError("no_video", "Choose a video or load a synthetic demo.", "No video input.")
-        return VideoInput(path=self.video_path) if self.video_path else VideoInput(frames_rgb=self._loaded.frames_rgb)
+        return VideoInput(path=self.video_path) if self.video_path else VideoInput(
+            frames_rgb=self._loaded.frames_rgb,
+            source_identifier=self._loaded.source_identifiers[0],
+        )
 
     def build_request(self):
         return VelocityRequest(self.video_input(), self.calibration_spin.value(), self.fps_spin.value(),
             **{name: spin.value() for name, spin in self.video_parameters.items()}, roi=self.region())
 
-    def load_demo(self):
+    def demo_frames(self):
         from .video_demo import moving_video_demo
 
+        return moving_video_demo()
+
+    def load_demo(self):
         self.video_path = None
-        frames = moving_video_demo()
+        self.crop_enabled.setChecked(False)
+        self.calibration_spin.setValue(1)
+        self.fps_spin.setValue(1)
+        for name, _, default in self.parameter_definitions():
+            self.video_parameters[name].setValue(default)
+        frames = self.demo_frames()
         self._set_loaded(LoadedImages(frames, tuple(f"synthetic frame {i}" for i in range(len(frames))),
-            ("synthetic://moving-particles",), frames[0].shape[1], frames[0].shape[0], True))
+            (self.demo_source_identifier,), frames[0].shape[1], frames[0].shape[0], True))
+        self.progress_message.setText("Synthetic demonstration loaded; default parameters restored")
 
     def clear_inputs(self):
         self.video_path = None
